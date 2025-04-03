@@ -1,0 +1,4 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+git diff --cached --name-only | xargs -L1 wc -l 2>/dev/null | awk '$1 > 300 {print "Warning: " $2 " has " $1 " lines which exceeds recommended limit of 300 lines."}' 

@@ -1,5 +1,4 @@
 import { AppSidebar } from "@/components/app-sidebar";
-import { Toaster } from "@workspace/ui/components/sonner";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -43,7 +42,6 @@ export default function DashboardLayout({
           </Breadcrumb>
         </header>
         <main className="flex flex-1 flex-col gap-4 p-4">{children}</main>
-        <Toaster />
       </SidebarInset>
     </SidebarProvider>
   );
