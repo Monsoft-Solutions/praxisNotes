@@ -19,7 +19,8 @@ import { Button } from "@workspace/ui/components/button";
 import { Badge } from "@workspace/ui/components/badge";
 import { PlusIcon } from "lucide-react";
 import { useBehaviors } from "@/hooks/use-behaviors";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
   Pagination,
   PaginationContent,
@@ -31,11 +32,31 @@ import {
 } from "@workspace/ui/components/pagination";
 
 export function BehaviorsTable() {
-  const [page, setPage] = useState<number>(1);
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const pageParam = searchParams.get("page");
+  const [page, setPage] = useState<number>(pageParam ? parseInt(pageParam) : 1);
+
   const { behaviors, pagination, isLoading, isError } = useBehaviors({
     limit: 10, // Default limit of 10 items per page
     page,
   });
+
+  // Update URL when page changes
+  useEffect(() => {
+    const current = new URLSearchParams(Array.from(searchParams.entries()));
+
+    if (page > 1) {
+      current.set("page", page.toString());
+    } else {
+      current.delete("page");
+    }
+
+    const search = current.toString();
+    const query = search ? `?${search}` : "";
+
+    router.push(`${window.location.pathname}${query}`, { scroll: false });
+  }, [page, router, searchParams]);
 
   const handlePageChange = (newPage: number) => {
     setPage(newPage);
