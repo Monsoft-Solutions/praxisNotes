@@ -21,15 +21,7 @@ import { PlusIcon, ChevronDown, Search, MoreHorizontal } from "lucide-react";
 import { useBehaviors } from "@/hooks/use-behaviors";
 import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import {
-  Pagination,
-  PaginationContent,
-  PaginationEllipsis,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from "@workspace/ui/components/pagination";
+import { PaginationControl } from "@workspace/ui/components/pagination-control";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -211,119 +203,14 @@ export function BehaviorsTable() {
           </Table>
 
           {pagination && pagination.totalPages > 1 && (
-            <div className="mt-4 flex items-center justify-between">
-              <Pagination>
-                <PaginationContent>
-                  {page > 1 && (
-                    <PaginationItem>
-                      <PaginationPrevious
-                        onClick={() => handlePageChange(page - 1)}
-                      />
-                    </PaginationItem>
-                  )}
-
-                  {/* First page */}
-                  <PaginationItem>
-                    <PaginationLink
-                      isActive={page === 1}
-                      onClick={() => handlePageChange(1)}
-                    >
-                      1
-                    </PaginationLink>
-                  </PaginationItem>
-
-                  {/* Show ellipsis if there are more pages before current page */}
-                  {page > 3 && (
-                    <PaginationItem>
-                      <PaginationEllipsis />
-                    </PaginationItem>
-                  )}
-
-                  {/* Page before current */}
-                  {page > 2 && (
-                    <PaginationItem>
-                      <PaginationLink
-                        onClick={() => handlePageChange(page - 1)}
-                      >
-                        {page - 1}
-                      </PaginationLink>
-                    </PaginationItem>
-                  )}
-
-                  {/* Current page (if not first or last) */}
-                  {page !== 1 && page !== pagination.totalPages && (
-                    <PaginationItem>
-                      <PaginationLink isActive>{page}</PaginationLink>
-                    </PaginationItem>
-                  )}
-
-                  {/* Page after current */}
-                  {page < pagination.totalPages - 1 && (
-                    <PaginationItem>
-                      <PaginationLink
-                        onClick={() => handlePageChange(page + 1)}
-                      >
-                        {page + 1}
-                      </PaginationLink>
-                    </PaginationItem>
-                  )}
-
-                  {/* Show ellipsis if there are more pages after current page */}
-                  {page < pagination.totalPages - 2 && (
-                    <PaginationItem>
-                      <PaginationEllipsis />
-                    </PaginationItem>
-                  )}
-
-                  {/* Last page (if not first) */}
-                  {pagination.totalPages > 1 && (
-                    <PaginationItem>
-                      <PaginationLink
-                        isActive={page === pagination.totalPages}
-                        onClick={() => handlePageChange(pagination.totalPages)}
-                      >
-                        {pagination.totalPages}
-                      </PaginationLink>
-                    </PaginationItem>
-                  )}
-
-                  {page < pagination.totalPages && (
-                    <PaginationItem>
-                      <PaginationNext
-                        onClick={() => handlePageChange(page + 1)}
-                      />
-                    </PaginationItem>
-                  )}
-                </PaginationContent>
-              </Pagination>
-
-              <div className="flex items-center gap-2">
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="min-w-[80px]"
-                    >
-                      {limit} <ChevronDown className="ml-2 h-4 w-4" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuItem onClick={() => handleLimitChange(5)}>
-                      5
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => handleLimitChange(10)}>
-                      10
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => handleLimitChange(25)}>
-                      25
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => handleLimitChange(50)}>
-                      50
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </div>
+            <div className="mt-4">
+              <PaginationControl
+                page={page}
+                totalPages={pagination.totalPages}
+                limit={limit}
+                onPageChange={handlePageChange}
+                onLimitChange={handleLimitChange}
+              />
             </div>
           )}
         </CardContent>
