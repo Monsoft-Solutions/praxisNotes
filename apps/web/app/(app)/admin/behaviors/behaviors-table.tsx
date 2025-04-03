@@ -17,7 +17,7 @@ import {
 } from "@workspace/ui/components/table";
 import { Button } from "@workspace/ui/components/button";
 import { Badge } from "@workspace/ui/components/badge";
-import { PlusIcon, ChevronDown, Search, MoreHorizontal } from "lucide-react";
+import { PlusIcon, Search, MoreHorizontal } from "lucide-react";
 import { useBehaviors } from "@/hooks/use-behaviors";
 import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";

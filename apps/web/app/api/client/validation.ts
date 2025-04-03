@@ -12,7 +12,7 @@ export const getClientQuerySchema = z
   })
   .merge(paginationSchema)
   .refine(
-    (data) => {
+    () => {
       // Ensure at least one of the optional parameters is provided
       // If neither is provided, that's still valid (returns all clients)
       return true;

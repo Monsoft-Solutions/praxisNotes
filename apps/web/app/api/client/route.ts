@@ -1,13 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db, withDb } from "../../../lib/db";
 import { count, eq, ilike, or } from "drizzle-orm";
-import { ApiError, ErrorCode } from "@praxisnotes/types";
+import { ErrorCode } from "@praxisnotes/types";
 
 // Direct import from client table
 import { Client, clients } from "@praxisnotes/database";
 import { createErrorResponse, createApiResponse } from "@/lib/api";
-import { authOptions, getSession } from "@/lib/auth";
-import { getServerSession } from "next-auth";
+import { getSession } from "@/lib/auth";
 import { validateQuery } from "@/lib/api/validation";
 import { getClientQuerySchema } from "./validation";
 

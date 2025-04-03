@@ -1,7 +1,7 @@
 import { NextRequest } from "next/server";
 import { db, withDb } from "../../../lib/db";
-import { eq, isNull, or, ilike, desc, asc, sql, count } from "drizzle-orm";
-import { replacementPrograms, behaviors } from "@praxisnotes/database";
+import { eq, isNull, or, ilike, desc, asc, count } from "drizzle-orm";
+import { replacementPrograms } from "@praxisnotes/database";
 import { createApiResponse, createErrorResponse } from "@/lib/api";
 import { requireAuthWithOrg } from "@/lib/auth/auth";
 import { ErrorCode } from "@praxisnotes/types";
@@ -43,7 +43,6 @@ export async function GET(request: NextRequest) {
       const sortOrder = searchParams.get("order") || "asc";
       const search = searchParams.get("search");
       const category = searchParams.get("category");
-      const targetBehaviorId = searchParams.get("targetBehaviorId");
 
       // Build the base query
       let query = db
@@ -64,12 +63,6 @@ export async function GET(request: NextRequest) {
 
       if (category) {
         query = query.where(eq(replacementPrograms.category, category));
-      }
-
-      if (targetBehaviorId) {
-        query = query.where(
-          eq(replacementPrograms.targetBehaviorId, targetBehaviorId),
-        );
       }
 
       // Apply sorting
