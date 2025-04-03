@@ -1,10 +1,12 @@
 import { NextRequest } from "next/server";
 import { db, withDb } from "../../../lib/db";
-import { eq, isNull, or, ilike, desc, asc, sql, count } from "drizzle-orm";
+import { eq, isNull, or, ilike, desc, asc, count } from "drizzle-orm";
 import { behaviors } from "@praxisnotes/database";
 import { createApiResponse, createErrorResponse } from "@/lib/api";
 import { requireAuthWithOrg } from "@/lib/auth/auth";
 import { ErrorCode } from "@praxisnotes/types";
+import { validateQuery } from "@/lib/api/validation";
+import { getBehaviorsQuerySchema } from "./validation";
 
 /**
  * GET handler for behaviors API
@@ -33,15 +35,18 @@ export async function GET(request: NextRequest) {
         );
       }
 
-      // Parse query parameters
-      const { searchParams } = new URL(request.url);
-      const page = Math.max(1, parseInt(searchParams.get("page") || "1"));
-      const limit = Math.min(100, parseInt(searchParams.get("limit") || "50"));
+      // Validate query parameters
+      const queryValidation = await validateQuery(
+        request,
+        getBehaviorsQuerySchema,
+      );
+      if (!queryValidation.success) {
+        return queryValidation.response;
+      }
+
+      const { page, limit, sort, order, search, category } =
+        queryValidation.data;
       const offset = (page - 1) * limit;
-      const sortField = searchParams.get("sort") || "name";
-      const sortOrder = searchParams.get("order") || "asc";
-      const search = searchParams.get("search");
-      const category = searchParams.get("category");
 
       // Build the base query
       let query = db
@@ -65,19 +70,19 @@ export async function GET(request: NextRequest) {
       }
 
       // Apply sorting
-      if (sortField === "name") {
+      if (sort === "name") {
         query =
-          sortOrder === "desc"
+          order === "desc"
             ? query.orderBy(desc(behaviors.name))
             : query.orderBy(asc(behaviors.name));
-      } else if (sortField === "category") {
+      } else if (sort === "category") {
         query =
-          sortOrder === "desc"
+          order === "desc"
             ? query.orderBy(desc(behaviors.category))
             : query.orderBy(asc(behaviors.category));
-      } else if (sortField === "createdAt") {
+      } else if (sort === "createdAt") {
         query =
-          sortOrder === "desc"
+          order === "desc"
             ? query.orderBy(desc(behaviors.createdAt))
             : query.orderBy(asc(behaviors.createdAt));
       }
