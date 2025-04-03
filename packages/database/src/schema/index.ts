@@ -13,6 +13,9 @@ export * from "./client.table";
 // Behaviors
 export * from "./behavior.table";
 
+// Replacement Programs
+export * from "./replacement-program.table";
+
 // Relationship tables
 export * from "./user-role.table";
 export * from "./user-client.table";

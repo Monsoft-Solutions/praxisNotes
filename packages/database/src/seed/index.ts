@@ -3,6 +3,7 @@ import { seed as seedOrganizations } from "./organizations";
 import { seed as seedUsers } from "./users";
 import { seed as seedClients } from "./clients";
 import { seedBehaviors } from "./behaviors.seed";
+import { seedReplacementPrograms } from "./replacement-programs.seed";
 import { db } from "../client";
 import { reset } from "drizzle-seed";
 import * as schema from "../schema";
@@ -10,7 +11,14 @@ import { users, organizations } from "../schema";
 import { eq, ilike } from "drizzle-orm";
 
 // Export individual seed functions
-export { seedRoles, seedOrganizations, seedUsers, seedClients, seedBehaviors };
+export {
+  seedRoles,
+  seedOrganizations,
+  seedUsers,
+  seedClients,
+  seedBehaviors,
+  seedReplacementPrograms,
+};
 
 /**
  * Main function to seed all data
@@ -57,9 +65,14 @@ export async function seedAll() {
       organizationResult[0]?.id &&
       userResult[0]?.id
     ) {
+      // Seed behaviors first, as replacement programs depend on them
       await seedBehaviors(organizationResult[0].id, userResult[0].id);
+      // Seed replacement programs after behaviors
+      await seedReplacementPrograms(organizationResult[0].id, userResult[0].id);
     } else {
-      console.error("Could not seed behaviors: missing organization or user");
+      console.error(
+        "Could not seed behaviors or replacement programs: missing organization or user",
+      );
     }
 
     console.log("✅ Database seeded successfully!");
