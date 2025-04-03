@@ -17,7 +17,7 @@ import {
 } from "@workspace/ui/components/table";
 import { Button } from "@workspace/ui/components/button";
 import { Badge } from "@workspace/ui/components/badge";
-import { PlusIcon } from "lucide-react";
+import { PlusIcon, ChevronDown } from "lucide-react";
 import { useBehaviors } from "@/hooks/use-behaviors";
 import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -30,19 +30,30 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@workspace/ui/components/pagination";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@workspace/ui/components/dropdown-menu";
 
 export function BehaviorsTable() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const pageParam = searchParams.get("page");
+  const limitParam = searchParams.get("limit");
+
   const [page, setPage] = useState<number>(pageParam ? parseInt(pageParam) : 1);
+  const [limit, setLimit] = useState<number>(
+    limitParam ? parseInt(limitParam) : 10,
+  );
 
   const { behaviors, pagination, isLoading, isError } = useBehaviors({
-    limit: 10, // Default limit of 10 items per page
+    limit,
     page,
   });
 
-  // Update URL when page changes
+  // Update URL when page or limit changes
   useEffect(() => {
     const current = new URLSearchParams(Array.from(searchParams.entries()));
 
@@ -52,14 +63,26 @@ export function BehaviorsTable() {
       current.delete("page");
     }
 
+    if (limit !== 10) {
+      current.set("limit", limit.toString());
+    } else {
+      current.delete("limit");
+    }
+
     const search = current.toString();
     const query = search ? `?${search}` : "";
 
     router.push(`${window.location.pathname}${query}`, { scroll: false });
-  }, [page, router, searchParams]);
+  }, [page, limit, router, searchParams]);
 
   const handlePageChange = (newPage: number) => {
     setPage(newPage);
+  };
+
+  const handleLimitChange = (value: number) => {
+    setLimit(value);
+    // Reset to page 1 when changing items per page
+    setPage(1);
   };
 
   if (isError) {
@@ -94,8 +117,34 @@ export function BehaviorsTable() {
       </div>
 
       <Card>
-        <CardHeader>
+        <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle>Behaviors</CardTitle>
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-muted-foreground">
+              Items per page:
+            </span>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="sm" className="min-w-[80px]">
+                  {limit} <ChevronDown className="ml-2 h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={() => handleLimitChange(5)}>
+                  5
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleLimitChange(10)}>
+                  10
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleLimitChange(25)}>
+                  25
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleLimitChange(50)}>
+                  50
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         </CardHeader>
         <CardContent>
           <Table>
