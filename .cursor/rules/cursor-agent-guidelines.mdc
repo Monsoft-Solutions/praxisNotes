@@ -1,0 +1,84 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+ # Cursor AI Agent Guidelines
+
+This document outlines all available rules and guidelines for the AI assistant to follow when working with the PraxisNotes codebase. The AI should follow the relevant rules based on the specific task being performed.
+
+## Available Rules and Their Purposes
+
+### API Routes Implementation
+- **File Path:** `.cursor/rules/api-routes.rules.mdc`
+- **Purpose:** Guidelines for implementing and structuring API routes in the application.
+
+### Database Usage
+- **File Path:** `.cursor/rules/database.rules.mdc`
+- **Purpose:** Guidelines for interacting with the database, including schema design and query patterns.
+
+### Types Definitions
+- **File Path:** `.cursor/rules/types.rules.mdc`
+- **Purpose:** Standards for defining and using TypeScript types throughout the application.
+
+### Cursor Rules Management
+- **File Path:** `.cursor/rules/cursor-rules.rule.mdc`
+- **Purpose:** Instructions for adding or modifying Cursor rules within the project.
+
+### Data Fetching
+- **File Path:** `.cursor/rules/data-fetching.rules.mdc`
+- **Purpose:** Best practices for fetching data from APIs using SWR.
+
+### UI Components
+- **File Path:** `.cursor/rules/components.rules.mdc`
+- **Purpose:** Comprehensive guide for creating UI components using Shadcn UI, Radix UI, and Tailwind.
+
+### Page Structure
+- **File Path:** `.cursor/rules/page-structure.rules.mdc`
+- **Purpose:** Guidelines for structuring Next.js pages in the application.
+
+### TypeScript Best Practices
+- **File Path:** `.cursor/rules/typescript.rules.mdc`
+- **Purpose:** TypeScript code style and best practices for the project.
+
+### Technical Documentation
+- **File Path:** `.cursor/rules/technical-documentation-writer.mdc`
+- **Purpose:** Standards for writing technical documentation.
+
+### Software Architecture
+- **File Path:** `.cursor/rules/software-engineer-and-architect.rules.mdc`
+- **Purpose:** Guidelines for software architecture decisions and implementation.
+
+### GitHub Issues
+- **File Path:** `.cursor/rules/github-issues.rules.mdc`
+- **Purpose:** Standards for creating and managing GitHub issues.
+
+### Pull Requests
+- **File Path:** `.cursor/rules/pull-request.rules.mdc`
+- **Purpose:** Guidelines for creating and reviewing pull requests.
+
+### Code Review
+- **File Path:** `.cursor/rules/reviewer-and-code-enhancement.rules.mdc`
+- **Purpose:** Best practices for reviewing and enhancing code quality.
+
+## Guidelines for Using These Rules
+
+1. **Task-Specific Application:** Apply the relevant rules based on the specific task you're working on:
+   - For UI components, refer to the components.rules
+   - For data operations, use database.rules and data-fetching.rules
+   - For TypeScript coding, follow typescript.rules
+   - For API implementation, consult api-routes.rules
+
+2. **Priority Order:**
+   - Project-specific rules take precedence over general best practices
+   - When rules overlap, apply the most specific rule for the task at hand
+
+3. **Continuous Compliance:**
+   - Throughout the development process, continuously check against these guidelines
+   - Validate your work against the relevant rules before completing tasks
+
+4. **Rule Combinations:**
+   - Multiple rules may apply to a single task; in such cases, combine the guidance from all relevant rules
+   - For example, when creating a new API endpoint that accesses the database, follow both api-routes.rules and database.rules
+
+The AI assistant should fetch the full rule content when necessary to ensure complete understanding and proper implementation.

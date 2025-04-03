@@ -1,0 +1,57 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# TypeScript Code Style and Best Practices
+
+## ✅ Naming Conventions
+
+### 📄 File Naming
+
+- Use **kebab-case** for all file names.
+- Use semantic suffixes to clearly indicate the content type:
+  - `*.type.ts` → Type aliases
+  - `*.interface.ts` → Interfaces (only when necessary)
+  - `*.enum.ts` → Enums
+  - `*.model.ts` → Data models (if applicable)
+  - `*.table.ts` → Database-related table definitions
+  - `*.service.ts` → Business logic or service layers
+  - `*.util.ts` or `*.helper.ts` → Utility functions or helpers
+  - `*.hook.ts` → React or framework hooks
+  - `*.config.ts` → Configuration files
+- Example:  
+  - `user.type.ts`  
+  - `user.enum.ts`  
+  - `auth.service.ts`  
+  - `database.config.ts`
+
+### 🔤 Code Naming
+
+- **Types, Interfaces, Enums, Classes:** Use `PascalCase`
+- **Variables, Functions, Parameters:** Use `camelCase`
+- **Constants:** Use `UPPER_SNAKE_CASE` for global constants
+- **Private class members:** Prefix with underscore (`_example`)
+- **Generic Type Parameters:** Use single uppercase letters (`T`, `K`, `V`) and extend with context when appropriate (`TUser`, `TResult`)
+
+---
+
+## 🧩 Type Definitions
+
+- Prefer `type` over `interface`, unless declaration merging is needed.
+- Keep types descriptive and single-purpose.
+- Use `readonly` for immutable properties.
+- Prefer union types (`type`) over enums unless enums are clearly beneficial.
+- Place all type-related files in a central `/types` or `/models` folder.
+- Limit to one type, interface, or enum per file.
+
+---
+
+## ⚙️ Functions
+
+- Use arrow functions for inline callbacks and anonymous functions.
+- Always explicitly type parameters and return values.
+- Prefer `async/await` over raw Promises.
+- Use descriptive object parameter patterns:
+  ```ts
+  const updateUser = ({ id, data }: { id: string; data: UserInput }) => { ... };
