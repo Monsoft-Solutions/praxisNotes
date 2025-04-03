@@ -17,7 +17,7 @@ import {
 } from "@workspace/ui/components/table";
 import { Button } from "@workspace/ui/components/button";
 import { Badge } from "@workspace/ui/components/badge";
-import { PlusIcon, ChevronDown } from "lucide-react";
+import { PlusIcon, ChevronDown, Search, MoreHorizontal } from "lucide-react";
 import { useBehaviors } from "@/hooks/use-behaviors";
 import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -34,28 +34,39 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@workspace/ui/components/dropdown-menu";
+import { Input } from "@workspace/ui/components/input";
 
 export function BehaviorsTable() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const pageParam = searchParams.get("page");
   const limitParam = searchParams.get("limit");
+  const searchParam = searchParams.get("search");
 
   const [page, setPage] = useState<number>(pageParam ? parseInt(pageParam) : 1);
   const [limit, setLimit] = useState<number>(
     limitParam ? parseInt(limitParam) : 10,
   );
+  const [searchQuery, setSearchQuery] = useState<string>(searchParam || "");
 
   const { behaviors, pagination, isLoading, isError } = useBehaviors({
     limit,
     page,
+    search: searchQuery,
   });
 
-  // Update URL when page or limit changes
+  // Update URL when page, limit, or search changes
   useEffect(() => {
     const current = new URLSearchParams(Array.from(searchParams.entries()));
+
+    if (searchQuery) {
+      current.set("search", searchQuery);
+    } else {
+      current.delete("search");
+    }
 
     if (page > 1) {
       current.set("page", page.toString());
@@ -73,7 +84,7 @@ export function BehaviorsTable() {
     const query = search ? `?${search}` : "";
 
     router.push(`${window.location.pathname}${query}`, { scroll: false });
-  }, [page, limit, router, searchParams]);
+  }, [page, limit, searchQuery, router, searchParams]);
 
   const handlePageChange = (newPage: number) => {
     setPage(newPage);
@@ -85,11 +96,16 @@ export function BehaviorsTable() {
     setPage(1);
   };
 
+  const handleSearch = (value: string) => {
+    setSearchQuery(value);
+    // Reset to page 1 when searching
+    setPage(1);
+  };
+
   if (isError) {
     return (
       <div className="space-y-4">
         <div className="flex justify-between">
-          <h3 className="text-xl font-semibold">Behaviors Management</h3>
           <Button size="sm">
             <PlusIcon className="mr-2 h-4 w-4" />
             Add Behavior
@@ -108,45 +124,32 @@ export function BehaviorsTable() {
 
   return (
     <div className="space-y-4">
-      <div className="flex justify-between">
-        <h3 className="text-xl font-semibold">Behaviors Management</h3>
-        <Button size="sm">
-          <PlusIcon className="mr-2 h-4 w-4" />
-          Add Behavior
-        </Button>
-      </div>
-
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle>Behaviors</CardTitle>
-          <div className="flex items-center gap-2">
-            <span className="text-sm text-muted-foreground">
-              Items per page:
-            </span>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="sm" className="min-w-[80px]">
-                  {limit} <ChevronDown className="ml-2 h-4 w-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={() => handleLimitChange(5)}>
-                  5
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => handleLimitChange(10)}>
-                  10
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => handleLimitChange(25)}>
-                  25
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => handleLimitChange(50)}>
-                  50
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+
+          <div className="flex justify-between">
+            <Button size="sm">
+              <PlusIcon className="mr-2 h-4 w-4" />
+              Add Behavior
+            </Button>
           </div>
         </CardHeader>
         <CardContent>
+          {/* Search input */}
+          <form className="flex items-center space-x-2 mb-4 w-md">
+            <div className="relative flex-1">
+              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+              <Input
+                type="search"
+                placeholder="Search behaviors..."
+                className="pl-8"
+                value={searchQuery}
+                onChange={(e) => handleSearch(e.target.value)}
+              />
+            </div>
+          </form>
+
           <Table>
             <TableHeader>
               <TableRow>
@@ -154,7 +157,7 @@ export function BehaviorsTable() {
                 <TableHead>Category</TableHead>
                 <TableHead>Scope</TableHead>
                 <TableHead>Description</TableHead>
-                <TableHead>Actions</TableHead>
+                <TableHead className="w-[80px]">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -177,14 +180,22 @@ export function BehaviorsTable() {
                     {behavior.description || "No description"}
                   </TableCell>
                   <TableCell>
-                    <div className="flex space-x-2">
-                      <Button variant="outline" size="sm">
-                        Edit
-                      </Button>
-                      <Button variant="destructive" size="sm">
-                        Delete
-                      </Button>
-                    </div>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" className="h-8 w-8 p-0">
+                          <span className="sr-only">Open menu</span>
+                          <MoreHorizontal className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem>View details</DropdownMenuItem>
+                        <DropdownMenuItem>Edit</DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem className="text-destructive">
+                          Delete
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </TableCell>
                 </TableRow>
               ))}
@@ -200,7 +211,7 @@ export function BehaviorsTable() {
           </Table>
 
           {pagination && pagination.totalPages > 1 && (
-            <div className="mt-4">
+            <div className="mt-4 flex items-center justify-between">
               <Pagination>
                 <PaginationContent>
                   {page > 1 && (
@@ -285,6 +296,34 @@ export function BehaviorsTable() {
                   )}
                 </PaginationContent>
               </Pagination>
+
+              <div className="flex items-center gap-2">
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="min-w-[80px]"
+                    >
+                      {limit} <ChevronDown className="ml-2 h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem onClick={() => handleLimitChange(5)}>
+                      5
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => handleLimitChange(10)}>
+                      10
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => handleLimitChange(25)}>
+                      25
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => handleLimitChange(50)}>
+                      50
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
             </div>
           )}
         </CardContent>

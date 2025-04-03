@@ -1,22 +1,6 @@
 import { Suspense } from "react";
-import { Behavior } from "@praxisnotes/database";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@workspace/ui/components/card";
-import {
-  Table,
-  TableHeader,
-  TableRow,
-  TableHead,
-  TableBody,
-  TableCell,
-} from "@workspace/ui/components/table";
-import { Button } from "@workspace/ui/components/button";
-import { Badge } from "@workspace/ui/components/badge";
-import { PlusIcon } from "lucide-react";
+import { Card, CardContent, CardHeader } from "@workspace/ui/components/card";
+
 import { Skeleton } from "@workspace/ui/components/skeleton";
 import { BehaviorsTable } from "./behaviors-table";
 
