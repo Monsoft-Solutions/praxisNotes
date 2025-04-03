@@ -1,6 +1,6 @@
 import { AuthSession, getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
-import { authOptions } from "../app/api/auth/[...nextauth]/route";
+import { authOptions } from "./auth/auth-options";
 
 /**
  * Get the current session on the server
@@ -19,8 +19,8 @@ export async function requireAuth(callbackUrl?: string) {
   if (!session?.user) {
     redirect(
       callbackUrl
-        ? `/auth/signin?callbackUrl=${encodeURIComponent(callbackUrl)}`
-        : "/auth/signin",
+        ? `/auth/login?callbackUrl=${encodeURIComponent(callbackUrl)}`
+        : "/auth/login",
     );
   }
 

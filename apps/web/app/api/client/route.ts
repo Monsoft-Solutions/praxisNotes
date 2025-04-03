@@ -6,13 +6,12 @@ import { ApiError, ErrorCode } from "@praxisnotes/types";
 // Direct import from client table
 import { Client, clients } from "@praxisnotes/database";
 import { createErrorResponse, createApiResponse } from "@/lib/api";
-import { withApiMiddleware } from "@/lib/api/middleware";
 
 /**
  * GET handler for clients API
  * Supports querying clients by id, search term, or returning all clients
  */
-async function getClients(request: NextRequest) {
+export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const id = searchParams.get("id");
   const search = searchParams.get("search");
@@ -79,5 +78,3 @@ async function getClients(request: NextRequest) {
     }
   });
 }
-
-export const GET = withApiMiddleware(getClients);

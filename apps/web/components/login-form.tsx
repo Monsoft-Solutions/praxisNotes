@@ -49,6 +49,7 @@ export function LoginForm({
     setIsLoading(true);
     console.log("data", data);
     try {
+      console.log("signing in");
       const result = await signIn("credentials", {
         redirect: false,
         email: data.email,
@@ -56,6 +57,7 @@ export function LoginForm({
       });
 
       if (result?.error) {
+        toast.error("Invalid email or password");
         setError("Invalid email or password");
         setIsLoading(false);
         return;
