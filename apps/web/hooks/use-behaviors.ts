@@ -40,12 +40,12 @@ export function useBehaviors(params?: BehaviorsParams) {
 
   return {
     behaviors: data?.data || [],
-    pagination: data?.meta
+    pagination: data?.pagination
       ? {
-          page: data.meta.page || 1,
-          perPage: data.meta.perPage || 50,
-          total: data.meta.total || 0,
-          totalPages: data.meta.totalPages || 0,
+          page: data.pagination.page || 1,
+          limit: data.pagination.limit || 50,
+          total: data.pagination.total || 0,
+          totalPages: data.pagination.totalPages || 0,
         }
       : null,
     isLoading,

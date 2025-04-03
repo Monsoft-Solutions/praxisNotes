@@ -19,11 +19,27 @@ import { Button } from "@workspace/ui/components/button";
 import { Badge } from "@workspace/ui/components/badge";
 import { PlusIcon } from "lucide-react";
 import { useBehaviors } from "@/hooks/use-behaviors";
+import { useState } from "react";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@workspace/ui/components/pagination";
 
 export function BehaviorsTable() {
-  const { behaviors, isLoading, isError } = useBehaviors({
-    limit: 100, // We'll fetch all behaviors for now, could implement pagination later
+  const [page, setPage] = useState<number>(1);
+  const { behaviors, pagination, isLoading, isError } = useBehaviors({
+    limit: 10, // Default limit of 10 items per page
+    page,
   });
+
+  const handlePageChange = (newPage: number) => {
+    setPage(newPage);
+  };
 
   if (isError) {
     return (
@@ -112,6 +128,95 @@ export function BehaviorsTable() {
               )}
             </TableBody>
           </Table>
+
+          {pagination && pagination.totalPages > 1 && (
+            <div className="mt-4">
+              <Pagination>
+                <PaginationContent>
+                  {page > 1 && (
+                    <PaginationItem>
+                      <PaginationPrevious
+                        onClick={() => handlePageChange(page - 1)}
+                      />
+                    </PaginationItem>
+                  )}
+
+                  {/* First page */}
+                  <PaginationItem>
+                    <PaginationLink
+                      isActive={page === 1}
+                      onClick={() => handlePageChange(1)}
+                    >
+                      1
+                    </PaginationLink>
+                  </PaginationItem>
+
+                  {/* Show ellipsis if there are more pages before current page */}
+                  {page > 3 && (
+                    <PaginationItem>
+                      <PaginationEllipsis />
+                    </PaginationItem>
+                  )}
+
+                  {/* Page before current */}
+                  {page > 2 && (
+                    <PaginationItem>
+                      <PaginationLink
+                        onClick={() => handlePageChange(page - 1)}
+                      >
+                        {page - 1}
+                      </PaginationLink>
+                    </PaginationItem>
+                  )}
+
+                  {/* Current page (if not first or last) */}
+                  {page !== 1 && page !== pagination.totalPages && (
+                    <PaginationItem>
+                      <PaginationLink isActive>{page}</PaginationLink>
+                    </PaginationItem>
+                  )}
+
+                  {/* Page after current */}
+                  {page < pagination.totalPages - 1 && (
+                    <PaginationItem>
+                      <PaginationLink
+                        onClick={() => handlePageChange(page + 1)}
+                      >
+                        {page + 1}
+                      </PaginationLink>
+                    </PaginationItem>
+                  )}
+
+                  {/* Show ellipsis if there are more pages after current page */}
+                  {page < pagination.totalPages - 2 && (
+                    <PaginationItem>
+                      <PaginationEllipsis />
+                    </PaginationItem>
+                  )}
+
+                  {/* Last page (if not first) */}
+                  {pagination.totalPages > 1 && (
+                    <PaginationItem>
+                      <PaginationLink
+                        isActive={page === pagination.totalPages}
+                        onClick={() => handlePageChange(pagination.totalPages)}
+                      >
+                        {pagination.totalPages}
+                      </PaginationLink>
+                    </PaginationItem>
+                  )}
+
+                  {page < pagination.totalPages && (
+                    <PaginationItem>
+                      <PaginationNext
+                        onClick={() => handlePageChange(page + 1)}
+                      />
+                    </PaginationItem>
+                  )}
+                </PaginationContent>
+              </Pagination>
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>

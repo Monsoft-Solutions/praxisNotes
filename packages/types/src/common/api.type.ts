@@ -53,7 +53,7 @@ export type PaginationMeta = {
 export type ApiDataResponse<T> = {
   data?: T;
   error?: ApiError;
-  meta?: Record<string, any>;
+  pagination?: Record<string, any>;
 };
 
 /**
@@ -62,7 +62,7 @@ export type ApiDataResponse<T> = {
 export type ApiListResponse<T> = {
   data?: T[];
   error?: ApiError;
-  meta?: PaginationMeta & Record<string, any>;
+  pagination?: PaginationMeta & Record<string, any>;
 };
 
 /**

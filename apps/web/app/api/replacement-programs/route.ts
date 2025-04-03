@@ -108,9 +108,9 @@ export async function GET(request: NextRequest) {
       const totalPages = Math.ceil(total / limit);
 
       return createApiResponse(userReplacementPrograms, {
-        meta: {
+        pagination: {
           page,
-          perPage: limit,
+          limit,
           total,
           totalPages,
         },

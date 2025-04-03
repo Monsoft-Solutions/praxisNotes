@@ -100,9 +100,9 @@ export async function GET(request: NextRequest) {
       const totalPages = Math.ceil(total / limit);
 
       return createApiResponse(userBehaviors, {
-        meta: {
+        pagination: {
           page,
-          perPage: limit,
+          limit,
           total,
           totalPages,
         },
