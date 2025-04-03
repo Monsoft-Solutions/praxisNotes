@@ -85,4 +85,9 @@ This document outlines all available rules and guidelines for the AI assistant t
 
 - After a sucessful code generation, run `pnpm run build` in order to ensure we haven't broke anything
 
+## Adding and using components
+- Always check if the component exist in the ui package or the component folder
+- For shadcn component, always go the web project, and install it like this: `npx shadcn@latest add progress`
+- For importing the component, check how we do it
+
 The AI assistant should fetch the full rule content when necessary to ensure complete understanding and proper implementation.
