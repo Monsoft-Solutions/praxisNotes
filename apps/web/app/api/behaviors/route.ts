@@ -3,7 +3,7 @@ import { db, withDb } from "../../../lib/db";
 import { eq, isNull, or, ilike, desc, asc, sql, count } from "drizzle-orm";
 import { behaviors } from "@praxisnotes/database";
 import { createApiResponse, createErrorResponse } from "@/lib/api";
-import { requireAuthWithOrg } from "@/lib/auth";
+import { requireAuthWithOrg } from "@/lib/auth/auth";
 import { ErrorCode } from "@praxisnotes/types";
 
 /**

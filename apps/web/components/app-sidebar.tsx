@@ -55,6 +55,16 @@ const data = {
       ],
     },
     {
+      title: "Admin",
+      url: "#",
+      items: [
+        {
+          title: "Behaviors",
+          url: "/admin/behaviors",
+        },
+      ],
+    },
+    {
       title: "Support",
       url: "#",
       items: [

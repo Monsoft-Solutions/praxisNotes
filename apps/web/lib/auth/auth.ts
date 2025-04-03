@@ -1,6 +1,6 @@
 import { AuthSession, getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
-import { authOptions } from "./auth/auth-options";
+import { authOptions } from "./auth-options";
 
 /**
  * Get the current session on the server
