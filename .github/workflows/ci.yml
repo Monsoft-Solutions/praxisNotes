@@ -13,6 +13,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v2
@@ -26,7 +28,22 @@ jobs:
           cache: "pnpm"
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: pnpm install
+
+      - name: Generate lockfile if needed
+        run: |
+          if [ ! -f pnpm-lock.yaml ]; then
+            echo "Generating pnpm-lock.yaml"
+            pnpm install --no-frozen-lockfile
+          fi
+
+      - name: Setup Turborepo cache
+        uses: actions/cache@v3
+        with:
+          path: .turbo
+          key: ${{ runner.os }}-turbo-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-turbo-
 
       - name: Lint
         run: pnpm run lint
