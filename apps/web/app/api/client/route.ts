@@ -54,7 +54,7 @@ async function getClients(request: NextRequest) {
       if (search.trim().length === 0) {
         return createErrorResponse(
           ErrorCode.BAD_REQUEST,
-          "Search term cannot be empty"
+          "Search term cannot be empty",
         );
       }
 
@@ -67,8 +67,8 @@ async function getClients(request: NextRequest) {
           or(
             ilike(clients.firstName, searchPattern),
             ilike(clients.lastName, searchPattern),
-            ilike(clients.email || "", searchPattern)
-          )
+            ilike(clients.email || "", searchPattern),
+          ),
         );
 
       return createApiResponse<Client[]>(filteredClients);

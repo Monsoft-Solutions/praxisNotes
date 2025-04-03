@@ -18,6 +18,7 @@ import { useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { toast } from "sonner";
 
 const signInSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
@@ -61,7 +62,8 @@ export function LoginForm({
       }
 
       router.push(callbackUrl);
-    } catch (err) {
+    } catch {
+      toast.error("An error occurred. Please try again.");
       setError("An error occurred. Please try again.");
       setIsLoading(false);
     }

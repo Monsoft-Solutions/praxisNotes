@@ -1,6 +1,7 @@
 {
   "$schema": "https://turbo.build/schema.json",
   "ui": "tui",
+  "globalEnv": ["DATABASE_URL", "NEXTAUTH_SECRET"],
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
@@ -16,6 +17,9 @@
     "dev": {
       "cache": false,
       "persistent": true
+    },
+    "format": {
+      "dependsOn": ["^format"]
     }
   }
 }

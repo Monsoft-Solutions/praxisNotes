@@ -56,7 +56,7 @@ export function ClientList() {
 
   const { data, error, isLoading } = useSWR<{ data: Client[] }>(
     apiUrl,
-    fetcher
+    fetcher,
   );
 
   const clients = data?.data || [];

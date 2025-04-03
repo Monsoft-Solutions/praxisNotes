@@ -22,7 +22,7 @@ export function handleApiError(error: unknown) {
         acc[path] = err.message;
         return acc;
       },
-      {} as Record<string, string>
+      {} as Record<string, string>,
     );
 
     return createValidationErrorResponse("Validation failed", {
@@ -35,28 +35,28 @@ export function handleApiError(error: unknown) {
     if (error.name === "NotFoundError") {
       return createErrorResponse(
         ErrorCode.NOT_FOUND,
-        error.message || "Resource not found"
+        error.message || "Resource not found",
       );
     }
 
     if (error.name === "UnauthorizedError") {
       return createErrorResponse(
         ErrorCode.UNAUTHORIZED,
-        error.message || "Unauthorized"
+        error.message || "Unauthorized",
       );
     }
 
     if (error.name === "ForbiddenError") {
       return createErrorResponse(
         ErrorCode.FORBIDDEN,
-        error.message || "Forbidden"
+        error.message || "Forbidden",
       );
     }
 
     if (error.name === "ValidationError") {
       return createErrorResponse(
         ErrorCode.VALIDATION_ERROR,
-        error.message || "Validation failed"
+        error.message || "Validation failed",
       );
     }
 
@@ -64,7 +64,7 @@ export function handleApiError(error: unknown) {
       return createErrorResponse(
         ErrorCode.DATABASE_ERROR,
         "Database operation failed",
-        { originalError: error.message }
+        { originalError: error.message },
       );
     }
   }

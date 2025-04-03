@@ -18,7 +18,7 @@ import {
  */
 export function createSuccessResponse<T>(
   data: T,
-  meta?: Record<string, any>
+  meta?: Record<string, unknown>,
 ): NextResponse<ApiDataResponse<T>> {
   return NextResponse.json({
     data,
@@ -34,7 +34,7 @@ export function createSuccessResponse<T>(
  */
 export function createListResponse<T>(
   data: T[],
-  meta: PaginationMeta
+  meta: PaginationMeta,
 ): NextResponse<ApiListResponse<T>> {
   return NextResponse.json({
     data,
@@ -50,7 +50,7 @@ export function createListResponse<T>(
  */
 export function createStatusResponse(
   success: boolean,
-  message?: string
+  message?: string,
 ): NextResponse<ApiStatusResponse> {
   return NextResponse.json({
     success,
@@ -68,7 +68,7 @@ export function createStatusResponse(
 export function createErrorResponse(
   code: ErrorCode,
   message: string,
-  details?: Record<string, unknown>
+  details?: Record<string, unknown>,
 ): NextResponse<ApiDataResponse<never>> {
   const error: ApiError = {
     code,
@@ -85,7 +85,7 @@ export function createErrorResponse(
  * @returns NextResponse with 404 status
  */
 export function createNotFoundResponse(
-  message = "Resource not found"
+  message = "Resource not found",
 ): NextResponse {
   return createErrorResponse(ErrorCode.NOT_FOUND, message);
 }
@@ -98,7 +98,7 @@ export function createNotFoundResponse(
  */
 export function createValidationErrorResponse(
   message = "Validation failed",
-  details?: Record<string, unknown>
+  details?: Record<string, unknown>,
 ): NextResponse {
   return createErrorResponse(ErrorCode.VALIDATION_ERROR, message, details);
 }
@@ -109,7 +109,7 @@ export function createValidationErrorResponse(
  * @returns NextResponse with 500 status
  */
 export function createServerErrorResponse(
-  message = "Internal server error"
+  message = "Internal server error",
 ): NextResponse {
   return createErrorResponse(ErrorCode.INTERNAL_SERVER_ERROR, message);
 }
@@ -120,7 +120,7 @@ export function createServerErrorResponse(
  * @returns NextResponse with 401 status
  */
 export function createUnauthorizedResponse(
-  message = "Unauthorized"
+  message = "Unauthorized",
 ): NextResponse {
   return createErrorResponse(ErrorCode.UNAUTHORIZED, message);
 }
@@ -145,7 +145,7 @@ export function createApiResponse<T>(
   options?: {
     status?: number;
     meta?: ApiResponse<T>["meta"];
-  }
+  },
 ): NextResponse {
   const response = {
     data,

@@ -6,7 +6,14 @@ import { handleApiError } from "./error-handler";
 /**
  * API middleware types
  */
-type NextApiHandler = (req: NextRequest, ctx?: any) => Promise<NextResponse>;
+type RouteContext = {
+  params: Record<string, string | string[]>;
+};
+
+type NextApiHandler = (
+  req: NextRequest,
+  ctx?: RouteContext,
+) => Promise<NextResponse>;
 
 type MiddlewareOptions = {
   requireAuth?: boolean;
@@ -23,9 +30,9 @@ type MiddlewareOptions = {
  */
 export function withApiMiddleware(
   handler: NextApiHandler,
-  options: MiddlewareOptions = {}
-): (req: NextRequest, ctx?: any) => Promise<NextResponse> {
-  return async (req: NextRequest, ctx?: any) => {
+  options: MiddlewareOptions = {},
+): (req: NextRequest, ctx?: RouteContext) => Promise<NextResponse> {
+  return async (req: NextRequest, ctx?: RouteContext) => {
     console.log(`API Request: ${req.method} ${req.url}`);
 
     try {
@@ -42,9 +49,9 @@ export function withApiMiddleware(
 
         // Role-based access control
         if (options.requiredRoles?.length && session.user) {
-          const userRoles = (session.user as any).roles || [];
+          const userRoles = (session.user as { roles?: string[] }).roles || [];
           const hasRequiredRole = options.requiredRoles.some((role) =>
-            userRoles.includes(role)
+            userRoles.includes(role),
           );
 
           if (!hasRequiredRole) {
