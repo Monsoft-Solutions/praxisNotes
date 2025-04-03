@@ -8,7 +8,8 @@ alwaysApply: false
 ## Architecture Principles
 
 - **Component Location**: 
-  - Implement shared components in `packages/ui`
+  - Implement shared components in `packages/ui` 
+  - Before implementing a component for a basic element, check if we can accomplish it with shadcn. If we do, then install the component
   - App-specific components should be in their respective app directories
   - Break complex views into smaller, reusable components
 
@@ -25,6 +26,7 @@ alwaysApply: false
 ### Installing New Shadcn Components
 
 ```sh
+cd apps/web
 npx shadcn@latest add <COMPONENT>
 ```
 
@@ -33,6 +35,10 @@ Example:
 ```sh
 npx shadcn@latest add progress
 ```
+
+### Using Shared components
+
+- Import them with: import { Button } from "@workspace/ui/components/button"; for the basic UI components installed through shadcn
 
 ### Image Optimization
 
