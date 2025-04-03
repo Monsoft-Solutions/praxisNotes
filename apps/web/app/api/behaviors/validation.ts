@@ -45,3 +45,27 @@ export const getBehaviorsQuerySchema = z
  * Type for GET behaviors query parameters
  */
 export type GetBehaviorsQueryParams = z.infer<typeof getBehaviorsQuerySchema>;
+
+/**
+ * Validation schema for creating a new behavior
+ */
+export const createBehaviorSchema = z.object({
+  name: z.string().min(1, "Name is required").max(255),
+  description: z.string().optional(),
+  category: z.string().max(100).optional(),
+});
+
+/**
+ * Type for creating a behavior
+ */
+export type CreateBehaviorRequest = z.infer<typeof createBehaviorSchema>;
+
+/**
+ * Validation schema for updating an existing behavior
+ */
+export const updateBehaviorSchema = createBehaviorSchema;
+
+/**
+ * Type for updating a behavior
+ */
+export type UpdateBehaviorRequest = z.infer<typeof updateBehaviorSchema>;

@@ -30,6 +30,7 @@ import {
   DropdownMenuTrigger,
 } from "@workspace/ui/components/dropdown-menu";
 import { Input } from "@workspace/ui/components/input";
+import { BehaviorForm } from "./behavior-form";
 
 export function BehaviorsTable() {
   const router = useRouter();
@@ -43,8 +44,12 @@ export function BehaviorsTable() {
     limitParam ? parseInt(limitParam) : 10,
   );
   const [searchQuery, setSearchQuery] = useState<string>(searchParam || "");
+  const [isAddOpen, setIsAddOpen] = useState(false);
+  const [currentBehavior, setCurrentBehavior] = useState<
+    Behavior | undefined
+  >();
 
-  const { behaviors, pagination, isLoading, isError } = useBehaviors({
+  const { behaviors, pagination, isLoading, isError, refresh } = useBehaviors({
     limit,
     page,
     search: searchQuery,
@@ -94,11 +99,25 @@ export function BehaviorsTable() {
     setPage(1);
   };
 
+  const handleEdit = (behavior: Behavior) => {
+    setCurrentBehavior(behavior);
+    setIsAddOpen(true);
+  };
+
+  const handleAdd = () => {
+    setCurrentBehavior(undefined);
+    setIsAddOpen(true);
+  };
+
+  const onFormSuccess = () => {
+    refresh();
+  };
+
   if (isError) {
     return (
       <div className="space-y-4">
         <div className="flex justify-between">
-          <Button size="sm">
+          <Button size="sm" onClick={handleAdd}>
             <PlusIcon className="mr-2 h-4 w-4" />
             Add Behavior
           </Button>
@@ -121,7 +140,7 @@ export function BehaviorsTable() {
           <CardTitle>Behaviors</CardTitle>
 
           <div className="flex justify-between">
-            <Button size="sm">
+            <Button size="sm" onClick={handleAdd}>
               <PlusIcon className="mr-2 h-4 w-4" />
               Add Behavior
             </Button>
@@ -180,8 +199,9 @@ export function BehaviorsTable() {
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
-                        <DropdownMenuItem>View details</DropdownMenuItem>
-                        <DropdownMenuItem>Edit</DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => handleEdit(behavior)}>
+                          Edit
+                        </DropdownMenuItem>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem className="text-destructive">
                           Delete
@@ -215,6 +235,14 @@ export function BehaviorsTable() {
           )}
         </CardContent>
       </Card>
+
+      {/* Behavior Form Dialog */}
+      <BehaviorForm
+        open={isAddOpen}
+        onOpenChange={setIsAddOpen}
+        behavior={currentBehavior}
+        onSuccess={onFormSuccess}
+      />
     </div>
   );
 }

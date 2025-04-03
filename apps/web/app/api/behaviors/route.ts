@@ -5,8 +5,8 @@ import { behaviors } from "@praxisnotes/database";
 import { createApiResponse, createErrorResponse } from "@/lib/api";
 import { requireAuthWithOrg } from "@/lib/auth/auth";
 import { ErrorCode } from "@praxisnotes/types";
-import { validateQuery } from "@/lib/api/validation";
-import { getBehaviorsQuerySchema } from "./validation";
+import { validateQuery, validateBody } from "@/lib/api/validation";
+import { getBehaviorsQuerySchema, createBehaviorSchema } from "./validation";
 
 /**
  * GET handler for behaviors API
@@ -22,7 +22,7 @@ import { getBehaviorsQuerySchema } from "./validation";
  * - category: Filter by category
  */
 export async function GET(request: NextRequest) {
-  return await withDb(async () => {
+  return withDb(async () => {
     try {
       // Require authenticated user with organization
       const session = await requireAuthWithOrg();
@@ -117,6 +117,58 @@ export async function GET(request: NextRequest) {
       return createErrorResponse(
         ErrorCode.INTERNAL_SERVER_ERROR,
         "Failed to fetch behaviors",
+      );
+    }
+  });
+}
+
+/**
+ * POST handler for creating a new behavior
+ * Creates a behavior that belongs to the user's organization
+ */
+export async function POST(request: NextRequest) {
+  return withDb(async () => {
+    try {
+      // Require authenticated user with organization
+      const session = await requireAuthWithOrg();
+      const { id: userId, organizationId } = session.user;
+
+      if (!organizationId) {
+        return createErrorResponse(
+          ErrorCode.UNAUTHORIZED,
+          "User must belong to an organization",
+        );
+      }
+
+      // Validate request body
+      const bodyValidation = await validateBody(request, createBehaviorSchema);
+      if (!bodyValidation.success) {
+        return bodyValidation.response;
+      }
+
+      const data = bodyValidation.data;
+
+      // Create new behavior
+      const [newBehavior] = await db
+        .insert(behaviors)
+        .values({
+          name: data.name,
+          description: data.description,
+          category: data.category,
+          organizationId: organizationId,
+          createdBy: userId,
+          updatedBy: userId,
+        })
+        .returning();
+
+      return createApiResponse(newBehavior, {
+        status: 201,
+      });
+    } catch (error) {
+      console.error("Error creating behavior:", error);
+      return createErrorResponse(
+        ErrorCode.INTERNAL_SERVER_ERROR,
+        "Failed to create behavior",
       );
     }
   });

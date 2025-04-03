@@ -8,7 +8,7 @@ import { db } from "../client";
 import { reset } from "drizzle-seed";
 import * as schema from "../schema";
 import { users, organizations } from "../schema";
-import { eq, ilike } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 
 // Export individual seed functions
 export {

@@ -11,7 +11,6 @@ import { z } from "zod";
 import { relations } from "drizzle-orm";
 import { organizations } from "./organization.table";
 import { users } from "./user.table";
-import { behaviors } from "./behavior.table";
 
 /**
  * Replacement Program table schema definition
