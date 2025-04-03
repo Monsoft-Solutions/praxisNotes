@@ -27,19 +27,11 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@workspace/ui/components/dropdown-menu";
-import { MoreHorizontal, Plus, Search, ChevronDown } from "lucide-react";
+import { MoreHorizontal, Plus, Search } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import useSWR from "swr";
 import { Client } from "@praxisnotes/database";
-import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationLink,
-  PaginationPrevious,
-  PaginationNext,
-  PaginationEllipsis,
-} from "@workspace/ui/components/pagination";
+import { PaginationControl } from "@workspace/ui/components/pagination-control";
 
 /**
  * Custom fetcher for SWR to handle API requests
@@ -238,86 +230,14 @@ export function ClientList() {
 
         {pagination && pagination.totalPages > 1 && (
           <div className="mt-4">
-            <Pagination>
-              <PaginationContent>
-                {page > 1 && (
-                  <PaginationItem>
-                    <PaginationPrevious
-                      onClick={() => handlePageChange(page - 1)}
-                    />
-                  </PaginationItem>
-                )}
-
-                {/* First page */}
-                <PaginationItem>
-                  <PaginationLink
-                    isActive={page === 1}
-                    onClick={() => handlePageChange(1)}
-                  >
-                    1
-                  </PaginationLink>
-                </PaginationItem>
-
-                {/* Show ellipsis if there are more pages before current page */}
-                {page > 3 && (
-                  <PaginationItem>
-                    <PaginationEllipsis />
-                  </PaginationItem>
-                )}
-
-                {/* Page before current */}
-                {page > 2 && (
-                  <PaginationItem>
-                    <PaginationLink onClick={() => handlePageChange(page - 1)}>
-                      {page - 1}
-                    </PaginationLink>
-                  </PaginationItem>
-                )}
-
-                {/* Current page (if not first or last) */}
-                {page !== 1 && page !== pagination.totalPages && (
-                  <PaginationItem>
-                    <PaginationLink isActive>{page}</PaginationLink>
-                  </PaginationItem>
-                )}
-
-                {/* Page after current */}
-                {page < pagination.totalPages - 1 && (
-                  <PaginationItem>
-                    <PaginationLink onClick={() => handlePageChange(page + 1)}>
-                      {page + 1}
-                    </PaginationLink>
-                  </PaginationItem>
-                )}
-
-                {/* Show ellipsis if there are more pages after current page */}
-                {page < pagination.totalPages - 2 && (
-                  <PaginationItem>
-                    <PaginationEllipsis />
-                  </PaginationItem>
-                )}
-
-                {/* Last page (if not first) */}
-                {pagination.totalPages > 1 && (
-                  <PaginationItem>
-                    <PaginationLink
-                      isActive={page === pagination.totalPages}
-                      onClick={() => handlePageChange(pagination.totalPages)}
-                    >
-                      {pagination.totalPages}
-                    </PaginationLink>
-                  </PaginationItem>
-                )}
-
-                {page < pagination.totalPages && (
-                  <PaginationItem>
-                    <PaginationNext
-                      onClick={() => handlePageChange(page + 1)}
-                    />
-                  </PaginationItem>
-                )}
-              </PaginationContent>
-            </Pagination>
+            <PaginationControl
+              page={page}
+              totalPages={pagination.totalPages}
+              limit={limit}
+              onPageChange={handlePageChange}
+              onLimitChange={handleLimitChange}
+              showLimitDropdown={false}
+            />
           </div>
         )}
       </CardContent>
@@ -328,27 +248,14 @@ export function ClientList() {
         </div>
         <div className="flex items-center gap-2">
           <span className="text-sm text-muted-foreground">Items per page:</span>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" size="sm" className="min-w-[80px]">
-                {limit} <ChevronDown className="ml-2 h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => handleLimitChange(5)}>
-                5
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => handleLimitChange(10)}>
-                10
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => handleLimitChange(25)}>
-                25
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => handleLimitChange(50)}>
-                50
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <PaginationControl
+            page={page}
+            totalPages={pagination?.totalPages || 1}
+            limit={limit}
+            onPageChange={handlePageChange}
+            onLimitChange={handleLimitChange}
+            showLimitDropdown={true}
+          />
         </div>
       </CardFooter>
     </Card>
