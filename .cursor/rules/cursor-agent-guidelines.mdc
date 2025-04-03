@@ -10,64 +10,64 @@ This document outlines all available rules and guidelines for the AI assistant t
 ## Available Rules and Their Purposes
 
 ### API Routes Implementation
-- **File Path:** `.cursor/rules/api-routes.rules.mdc`
+- **Reference:** [api-routes.rules.mdc](mdc:.cursor/rules/api-routes.rules.mdc)
 - **Purpose:** Guidelines for implementing and structuring API routes in the application.
 
 ### Database Usage
-- **File Path:** `.cursor/rules/database.rules.mdc`
+- **Rules:** [database.rules.mdc](mdc:.cursor/rules/database.rules.mdc)
 - **Purpose:** Guidelines for interacting with the database, including schema design and query patterns.
 
 ### Types Definitions
-- **File Path:** `.cursor/rules/types.rules.mdc`
+- **Rules:** [types.rules.mdc](mdc:.cursor/rules/types.rules.mdc)
 - **Purpose:** Standards for defining and using TypeScript types throughout the application.
 
 ### Cursor Rules Management
-- **File Path:** `.cursor/rules/cursor-rules.rule.mdc`
+- **Rules:** [cursor-rules.rule.mdc](mdc:.cursor/rules/cursor-rules.rule.mdc)
 - **Purpose:** Instructions for adding or modifying Cursor rules within the project.
 
 ### Data Fetching
-- **File Path:** `.cursor/rules/data-fetching.rules.mdc`
+- **Rules:** [data-fetching.rules.mdc](mdc:.cursor/rules/data-fetching.rules.mdc)
 - **Purpose:** Best practices for fetching data from APIs using SWR.
 
 ### UI Components
-- **File Path:** `.cursor/rules/components.rules.mdc`
+- **Rules:** [ui-components.rules.mdc](mdc:.cursor/rules/ui-components.rules.mdc)
 - **Purpose:** Comprehensive guide for creating UI components using Shadcn UI, Radix UI, and Tailwind.
 
 ### Page Structure
-- **File Path:** `.cursor/rules/page-structure.rules.mdc`
+- **Rules:** [page-structure.rules.mdc](mdc:.cursor/rules/page-structure.rules.mdc)
 - **Purpose:** Guidelines for structuring Next.js pages in the application.
 
 ### TypeScript Best Practices
-- **File Path:** `.cursor/rules/typescript.rules.mdc`
+- **Rules:** [typescript.rules.mdc](mdc:.cursor/rules/typescript.rules.mdc)
 - **Purpose:** TypeScript code style and best practices for the project.
 
 ### Technical Documentation
-- **File Path:** `.cursor/rules/technical-documentation-writer.mdc`
+- **Rules:** [technical-documentation-writer.mdc](mdc:.cursor/rules/technical-documentation-writer.mdc)
 - **Purpose:** Standards for writing technical documentation.
 
 ### Software Architecture
-- **File Path:** `.cursor/rules/software-engineer-and-architect.rules.mdc`
+- **Rules:** [software-engineer-and-architect.rules.mdc](mdc:.cursor/rules/software-engineer-and-architect.rules.mdc)
 - **Purpose:** Guidelines for software architecture decisions and implementation.
 
 ### GitHub Issues
-- **File Path:** `.cursor/rules/github-issues.rules.mdc`
+- **Rules:** [github-issues.rules.mdc](mdc:.cursor/rules/github-issues.rules.mdc)
 - **Purpose:** Standards for creating and managing GitHub issues.
 
 ### Pull Requests
-- **File Path:** `.cursor/rules/pull-request.rules.mdc`
+- **Rules:** [pull-request.rules.mdc](mdc:.cursor/rules/pull-request.rules.mdc)
 - **Purpose:** Guidelines for creating and reviewing pull requests.
 
 ### Code Review
-- **File Path:** `.cursor/rules/reviewer-and-code-enhancement.rules.mdc`
+- **Rules:** [reviewer-and-code-enhancement.rules.mdc](mdc:.cursor/rules/reviewer-and-code-enhancement.rules.mdc)
 - **Purpose:** Best practices for reviewing and enhancing code quality.
 
 ## Guidelines for Using These Rules
 
 1. **Task-Specific Application:** Apply the relevant rules based on the specific task you're working on:
-   - For UI components, refer to the components.rules
-   - For data operations, use database.rules and data-fetching.rules
-   - For TypeScript coding, follow typescript.rules
-   - For API implementation, consult api-routes.rules
+   - For UI components, refer to the [ui-components.rules.mdc](mdc:.cursor/rules/ui-components.rules.mdc)
+   - For data operations, use [database.rules.mdc](mdc:.cursor/rules/database.rules.mdc) and [data-fetching.rules.mdc](mdc:.cursor/rules/data-fetching.rules.mdc)
+   - For TypeScript coding, follow [typescript.rules.mdc](mdc:.cursor/rules/typescript.rules.mdc)
+   - For API implementation, consult [api-routes.rules.mdc](mdc:.cursor/rules/api-routes.rules.mdc)
 
 2. **Priority Order:**
    - Project-specific rules take precedence over general best practices
