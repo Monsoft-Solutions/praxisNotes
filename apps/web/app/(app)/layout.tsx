@@ -1,5 +1,4 @@
 import { AppSidebar } from "@/components/app-sidebar";
-import { Toaster } from "@workspace/ui/components/sonner";
 import {
   Breadcrumb,
   BreadcrumbItem,
