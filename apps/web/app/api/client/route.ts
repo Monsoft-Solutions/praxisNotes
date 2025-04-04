@@ -4,11 +4,21 @@ import { count, eq, ilike, or } from "drizzle-orm";
 import { ErrorCode } from "@praxisnotes/types";
 
 // Direct import from client table
-import { Client, clients } from "@praxisnotes/database";
+import {
+  Client,
+  clients,
+  clientBehaviors,
+  clientReplacementPrograms,
+  clientInterventions,
+  clientReplacementProgramBehaviors,
+  clientInterventionBehaviors,
+  insertClientSchema,
+} from "@praxisnotes/database";
 import { createErrorResponse, createApiResponse } from "@/lib/api";
 import { getSession } from "@/lib/auth";
 import { validateQuery } from "@/lib/api/validation";
-import { getClientQuerySchema } from "./validation";
+import { getClientQuerySchema, createClientBodySchema } from "./validation";
+import { z } from "zod";
 
 /**
  * GET handler for clients API
@@ -119,4 +129,138 @@ export async function GET(request: NextRequest) {
       });
     }
   });
+}
+
+/**
+ * POST handler for creating a new client with related entities
+ */
+export async function POST(request: NextRequest) {
+  const session = await getSession();
+
+  if (!session) {
+    return createErrorResponse(ErrorCode.UNAUTHORIZED, "Unauthorized");
+  }
+
+  if (!session.user.organizationId) {
+    return createErrorResponse(
+      ErrorCode.UNAUTHORIZED,
+      "User must belong to an organization",
+    );
+  }
+
+  try {
+    // Parse and validate request body
+    const body = await request.json();
+
+    const validationResult = createClientBodySchema.safeParse(body);
+    if (!validationResult.success) {
+      return createErrorResponse(
+        ErrorCode.BAD_REQUEST,
+        "Invalid client data",
+        validationResult.error.format(),
+      );
+    }
+
+    const { client, behaviors, replacementPrograms, interventions } =
+      validationResult.data;
+
+    return await withDb(async () => {
+      // Create the client
+      const [newClient] = await db
+        .insert(clients)
+        .values({
+          firstName: client.firstName,
+          lastName: client.lastName,
+          notes: client.notes,
+          organizationId: session.user.organizationId!,
+        })
+        .returning();
+
+      // Array to store created behavior IDs
+      const createdBehaviorIds: string[] = [];
+
+      // Create behaviors if provided
+      if (behaviors && behaviors.length > 0) {
+        for (const behavior of behaviors) {
+          const [newBehavior] = await db
+            .insert(clientBehaviors)
+            .values({
+              clientId: newClient.id,
+              behaviorName: behavior.behaviorName,
+              behaviorDescription: behavior.behaviorDescription || null,
+              baseline: behavior.baseline,
+              type: behavior.type,
+              topographies: behavior.topographies,
+            })
+            .returning();
+
+          createdBehaviorIds.push(newBehavior.id);
+        }
+      }
+
+      // Create replacement programs if provided
+      if (replacementPrograms && replacementPrograms.length > 0) {
+        for (const program of replacementPrograms) {
+          const [newProgram] = await db
+            .insert(clientReplacementPrograms)
+            .values({
+              clientId: newClient.id,
+              programName: program.programName,
+              programDescription: program.programDescription || null,
+              baseline: program.baseline,
+            })
+            .returning();
+
+          // Create behavior associations
+          for (const behaviorIndex of program.behaviorIndices) {
+            if (
+              behaviorIndex >= 0 &&
+              behaviorIndex < createdBehaviorIds.length
+            ) {
+              await db.insert(clientReplacementProgramBehaviors).values({
+                clientReplacementProgramId: newProgram.id,
+                clientBehaviorId: createdBehaviorIds[behaviorIndex],
+              });
+            }
+          }
+        }
+      }
+
+      // Create interventions if provided
+      if (interventions && interventions.length > 0) {
+        for (const intervention of interventions) {
+          const [newIntervention] = await db
+            .insert(clientInterventions)
+            .values({
+              clientId: newClient.id,
+              interventionName: intervention.interventionName,
+              interventionDescription:
+                intervention.interventionDescription || null,
+            })
+            .returning();
+
+          // Create behavior associations
+          for (const behaviorIndex of intervention.behaviorIndices) {
+            if (
+              behaviorIndex >= 0 &&
+              behaviorIndex < createdBehaviorIds.length
+            ) {
+              await db.insert(clientInterventionBehaviors).values({
+                clientInterventionId: newIntervention.id,
+                clientBehaviorId: createdBehaviorIds[behaviorIndex],
+              });
+            }
+          }
+        }
+      }
+
+      return createApiResponse<Client>(newClient);
+    });
+  } catch (error) {
+    console.error("Error creating client:", error);
+    return createErrorResponse(
+      ErrorCode.INTERNAL_SERVER_ERROR,
+      "Failed to create client",
+    );
+  }
 }

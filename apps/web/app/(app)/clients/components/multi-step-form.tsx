@@ -45,19 +45,36 @@ export function MultiStepForm({
     }
   }, [currentStep, completedSteps]);
 
-  const goToNextStep = () => {
+  const goToNextStep = async (e: React.MouseEvent<HTMLButtonElement>) => {
+    // Prevent any default form submission
+    e.preventDefault();
+
     if (currentStep < steps.length) {
-      onStepChange(currentStep + 1);
+      // Store current step for potential reverting
+      const previousStep = currentStep;
+
+      try {
+        // Attempt to change step
+        await onStepChange(currentStep + 1);
+      } catch (error) {
+        console.error("Error changing step:", error);
+      }
     }
   };
 
-  const goToPreviousStep = () => {
+  const goToPreviousStep = (e: React.MouseEvent<HTMLButtonElement>) => {
+    // Prevent any default form submission
+    e.preventDefault();
+
     if (currentStep > 1) {
       onStepChange(currentStep - 1);
     }
   };
 
-  const handleComplete = () => {
+  const handleComplete = (e: React.MouseEvent<HTMLButtonElement>) => {
+    // Prevent any default form submission
+    e.preventDefault();
+
     // Add the final step to completed steps if not already done
     if (!completedSteps.includes(steps.length)) {
       setCompletedSteps((prev) => [...prev, steps.length]);
@@ -127,13 +144,18 @@ export function MultiStepForm({
               variant="outline"
               onClick={goToPreviousStep}
               disabled={currentStep === 1 || isSubmitting}
+              type="button"
             >
               <ChevronLeft className="mr-2 h-4 w-4" />
               Previous
             </Button>
             <div className="flex gap-2">
               {!isLastStep && (
-                <Button onClick={goToNextStep} disabled={isSubmitting}>
+                <Button
+                  onClick={goToNextStep}
+                  disabled={isSubmitting}
+                  type="button"
+                >
                   Next
                   <ChevronRight className="ml-2 h-4 w-4" />
                 </Button>
@@ -142,6 +164,7 @@ export function MultiStepForm({
                 <Button
                   onClick={handleComplete}
                   disabled={isSubmitting || !isLastStepSubmitEnabled}
+                  type="button"
                 >
                   {isSubmitting ? "Submitting..." : "Complete"}
                 </Button>
