@@ -26,16 +26,25 @@ import {
 } from "@workspace/ui/components/form";
 import { Input } from "@workspace/ui/components/input";
 import { Textarea } from "@workspace/ui/components/textarea";
+import { Separator } from "@workspace/ui/components/separator";
+import { Trash2, PlusCircle } from "lucide-react";
 
 // Validation schema based on the database schema
 const formSchema = z.object({
   name: z.string().min(1, "Name is required").max(255),
   description: z.string().optional(),
   category: z.string().max(100).optional(),
-  // Note: Steps are handled separately or could be added here if needed
+  // Note: Steps are handled separately
 });
 
 type FormValues = z.infer<typeof formSchema>;
+
+// Step format for the form's state management
+interface Step {
+  id: string;
+  title: string;
+  description: string;
+}
 
 interface ReplacementProgramFormProps {
   open: boolean;
@@ -53,6 +62,7 @@ export function ReplacementProgramForm({
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const isEditing = !!replacementProgram;
+  const [steps, setSteps] = useState<Step[]>([]);
 
   // Initialize form
   const form = useForm<FormValues>({
@@ -72,13 +82,70 @@ export function ReplacementProgramForm({
         description: replacementProgram.description || "",
         category: replacementProgram.category || "",
       });
+
+      // Convert steps object to array for easier editing
+      if (replacementProgram.steps) {
+        const stepsArray = Object.entries(
+          replacementProgram.steps as Record<string, string>,
+        ).map(([key, value]) => ({
+          id: crypto.randomUUID(),
+          title: key,
+          description: value,
+        }));
+        setSteps(stepsArray);
+      } else {
+        setSteps([]);
+      }
+    } else {
+      // Reset when creating a new program
+      form.reset({
+        name: "",
+        description: "",
+        category: "",
+      });
+      setSteps([]);
     }
   }, [replacementProgram, form]);
+
+  const addStep = () => {
+    setSteps([
+      ...steps,
+      {
+        id: crypto.randomUUID(),
+        title: "",
+        description: "",
+      },
+    ]);
+  };
+
+  const removeStep = (id: string) => {
+    setSteps(steps.filter((step) => step.id !== id));
+  };
+
+  const updateStep = (
+    id: string,
+    field: "title" | "description",
+    value: string,
+  ) => {
+    setSteps(
+      steps.map((step) =>
+        step.id === id ? { ...step, [field]: value } : step,
+      ),
+    );
+  };
 
   const onSubmit = async (data: FormValues) => {
     setIsSubmitting(true);
 
     try {
+      // Convert steps array back to object
+      const stepsObject: Record<string, string> = {};
+      steps.forEach((step) => {
+        if (step.title.trim()) {
+          stepsObject[step.title] = step.description;
+        }
+      });
+
       const url = isEditing
         ? `/api/replacement-programs/${replacementProgram.id}`
         : "/api/replacement-programs";
@@ -90,7 +157,10 @@ export function ReplacementProgramForm({
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(data),
+        body: JSON.stringify({
+          ...data,
+          steps: stepsObject,
+        }),
       });
 
       if (!response.ok) {
@@ -108,6 +178,7 @@ export function ReplacementProgramForm({
       // Close modal and refresh data
       onOpenChange(false);
       form.reset();
+      setSteps([]);
 
       // Callback if provided
       if (onSuccess) {
@@ -130,7 +201,7 @@ export function ReplacementProgramForm({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-[550px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>
             {isEditing
@@ -194,6 +265,79 @@ export function ReplacementProgramForm({
                 </FormItem>
               )}
             />
+
+            <Separator className="my-4" />
+
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg font-medium">Program Steps</h3>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={addStep}
+                  className="flex items-center gap-1"
+                >
+                  <PlusCircle size={16} />
+                  Add Step
+                </Button>
+              </div>
+
+              {steps.length === 0 && (
+                <div className="text-center py-4 text-muted-foreground">
+                  No steps added yet. Add steps to complete your replacement
+                  program.
+                </div>
+              )}
+
+              {steps.map((step, index) => (
+                <div
+                  key={step.id}
+                  className="p-4 border rounded-md space-y-3 relative"
+                >
+                  <div className="absolute right-2 top-2">
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => removeStep(step.id)}
+                      aria-label="Remove step"
+                    >
+                      <Trash2 className="h-4 w-4 text-destructive" />
+                    </Button>
+                  </div>
+
+                  <div className="space-y-2">
+                    <FormLabel htmlFor={`step-${step.id}-title`}>
+                      Step {index + 1} Title
+                    </FormLabel>
+                    <Input
+                      id={`step-${step.id}-title`}
+                      value={step.title}
+                      onChange={(e) =>
+                        updateStep(step.id, "title", e.target.value)
+                      }
+                      placeholder="Enter step title"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <FormLabel htmlFor={`step-${step.id}-description`}>
+                      Description
+                    </FormLabel>
+                    <Textarea
+                      id={`step-${step.id}-description`}
+                      value={step.description}
+                      onChange={(e) =>
+                        updateStep(step.id, "description", e.target.value)
+                      }
+                      placeholder="Enter step description"
+                      className="resize-none"
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
 
             <DialogFooter>
               <Button

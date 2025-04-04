@@ -41,6 +41,11 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@workspace/ui/components/alert-dialog";
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "@workspace/ui/components/hover-card";
 import { toast } from "sonner";
 
 export function ReplacementProgramsTable() {
@@ -166,6 +171,28 @@ export function ReplacementProgramsTable() {
     refresh();
   };
 
+  // Helper to render steps in hover card
+  const renderSteps = (steps: Record<string, string> | null | undefined) => {
+    if (!steps || Object.keys(steps).length === 0) {
+      return <p className="text-muted-foreground">No steps defined</p>;
+    }
+
+    return (
+      <div className="space-y-2">
+        <h4 className="font-semibold">Program Steps:</h4>
+        <div className="rounded-md bg-muted p-3">
+          <ul className="list-disc pl-5 space-y-2">
+            {Object.entries(steps).map(([key, value]) => (
+              <li key={key} className="text-sm">
+                <span className="font-medium">{key}:</span> {value}
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    );
+  };
+
   if (isError) {
     return (
       <div className="space-y-4">
@@ -233,25 +260,55 @@ export function ReplacementProgramsTable() {
                 {replacementPrograms.map((program: ReplacementProgram) => (
                   <TableRow key={program.id}>
                     <TableCell className="font-medium">
-                      <div>
-                        {program.name}
-                        <div className="md:hidden mt-1">
-                          <Badge variant="outline" className="mr-1 text-xs">
-                            {program.category || "Uncategorized"}
-                          </Badge>
-                          <span className="sr-only">Scope:</span>
-                          {program.organizationId ? (
-                            <Badge className="text-xs">Org</Badge>
-                          ) : (
-                            <Badge variant="secondary" className="text-xs">
-                              Global
-                            </Badge>
-                          )}
-                        </div>
-                        <div className="lg:hidden mt-1 text-xs text-muted-foreground truncate max-w-[200px]">
-                          {program.description || "No description"}
-                        </div>
-                      </div>
+                      <HoverCard>
+                        <HoverCardTrigger asChild>
+                          <div className="cursor-pointer hover:underline">
+                            {program.name}
+                            <div className="md:hidden mt-1">
+                              <Badge variant="outline" className="mr-1 text-xs">
+                                {program.category || "Uncategorized"}
+                              </Badge>
+                              <span className="sr-only">Scope:</span>
+                              {program.organizationId ? (
+                                <Badge className="text-xs">Org</Badge>
+                              ) : (
+                                <Badge variant="secondary" className="text-xs">
+                                  Global
+                                </Badge>
+                              )}
+                            </div>
+                            <div className="lg:hidden mt-1 text-xs text-muted-foreground truncate max-w-[200px]">
+                              {program.description || "No description"}
+                            </div>
+                          </div>
+                        </HoverCardTrigger>
+                        <HoverCardContent className="w-80">
+                          <div className="space-y-3">
+                            <h3 className="text-lg font-semibold">
+                              {program.name}
+                            </h3>
+                            <p className="text-sm text-muted-foreground">
+                              {program.description ||
+                                "No description available"}
+                            </p>
+                            {renderSteps(
+                              program.steps as Record<string, string>,
+                            )}
+                            {program.organizationId && (
+                              <div className="pt-2">
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => handleEdit(program)}
+                                  className="w-full"
+                                >
+                                  Edit Program
+                                </Button>
+                              </div>
+                            )}
+                          </div>
+                        </HoverCardContent>
+                      </HoverCard>
                     </TableCell>
                     <TableCell className="hidden sm:table-cell">
                       <Badge variant="outline">
