@@ -15,9 +15,6 @@ export type ClientFormState = {
   firstName: string;
   lastName: string;
   gender: "male" | "female" | "other";
-  email?: string;
-  phone?: string;
-  address?: string;
   notes?: string;
 
   // Step 2: Behaviors
@@ -43,9 +40,6 @@ export type ClientFormSubmission = {
     firstName: string;
     lastName: string;
     gender: string;
-    email?: string;
-    phone?: string;
-    address?: string;
     notes?: string;
     organizationId: string;
   };
