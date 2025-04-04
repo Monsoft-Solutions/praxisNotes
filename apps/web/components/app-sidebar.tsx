@@ -63,6 +63,10 @@ const data = {
           url: "/admin/behaviors",
         },
         {
+          title: "Interventions",
+          url: "/admin/interventions",
+        },
+        {
           title: "Replacement Programs",
           url: "/admin/replacement-programs",
         },

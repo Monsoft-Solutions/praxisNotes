@@ -13,6 +13,9 @@ export * from "./client.table";
 // Behaviors
 export * from "./behavior.table";
 
+// Interventions
+export * from "./intervention.table";
+
 // Replacement Programs
 export * from "./replacement-program.table";
 

@@ -3,6 +3,7 @@ import { seed as seedOrganizations } from "./organizations";
 import { seed as seedUsers } from "./users";
 import { seed as seedClients } from "./clients";
 import { seedBehaviors } from "./behaviors.seed";
+import { seedInterventions } from "./interventions.seed";
 import { seedReplacementPrograms } from "./replacement-programs.seed";
 import { db } from "../client";
 import { reset } from "drizzle-seed";
@@ -17,6 +18,7 @@ export {
   seedUsers,
   seedClients,
   seedBehaviors,
+  seedInterventions,
   seedReplacementPrograms,
 };
 
@@ -67,11 +69,13 @@ export async function seedAll() {
     ) {
       // Seed behaviors first, as replacement programs depend on them
       await seedBehaviors(organizationResult[0].id, userResult[0].id);
+      // Seed interventions
+      await seedInterventions(organizationResult[0].id, userResult[0].id);
       // Seed replacement programs after behaviors
       await seedReplacementPrograms(organizationResult[0].id, userResult[0].id);
     } else {
       console.error(
-        "Could not seed behaviors or replacement programs: missing organization or user",
+        "Could not seed behaviors, interventions, or replacement programs: missing organization or user",
       );
     }
 
