@@ -62,6 +62,10 @@ const data = {
           title: "Behaviors",
           url: "/admin/behaviors",
         },
+        {
+          title: "Replacement Programs",
+          url: "/admin/replacement-programs",
+        },
       ],
     },
     {

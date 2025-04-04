@@ -5,6 +5,11 @@ import { replacementPrograms } from "@praxisnotes/database";
 import { createApiResponse, createErrorResponse } from "@/lib/api";
 import { requireAuthWithOrg } from "@/lib/auth/auth";
 import { ErrorCode } from "@praxisnotes/types";
+import { validateQuery, validateBody } from "@/lib/api/validation";
+import {
+  getReplacementProgramsQuerySchema,
+  createReplacementProgramSchema,
+} from "./validation";
 
 /**
  * GET handler for replacement programs API
@@ -18,10 +23,9 @@ import { ErrorCode } from "@praxisnotes/types";
  * - order: Sort order ('asc' or 'desc', default 'asc')
  * - search: Search term to filter by name
  * - category: Filter by category
- * - targetBehaviorId: Filter by target behavior
  */
 export async function GET(request: NextRequest) {
-  return await withDb(async () => {
+  return withDb(async () => {
     try {
       // Require authenticated user with organization
       const session = await requireAuthWithOrg();
@@ -34,15 +38,18 @@ export async function GET(request: NextRequest) {
         );
       }
 
-      // Parse query parameters
-      const { searchParams } = new URL(request.url);
-      const page = Math.max(1, parseInt(searchParams.get("page") || "1"));
-      const limit = Math.min(100, parseInt(searchParams.get("limit") || "50"));
+      // Validate query parameters
+      const queryValidation = await validateQuery(
+        request,
+        getReplacementProgramsQuerySchema,
+      );
+      if (!queryValidation.success) {
+        return queryValidation.response;
+      }
+
+      const { page, limit, sort, order, search, category } =
+        queryValidation.data;
       const offset = (page - 1) * limit;
-      const sortField = searchParams.get("sort") || "name";
-      const sortOrder = searchParams.get("order") || "asc";
-      const search = searchParams.get("search");
-      const category = searchParams.get("category");
 
       // Build the base query
       let query = db
@@ -66,19 +73,19 @@ export async function GET(request: NextRequest) {
       }
 
       // Apply sorting
-      if (sortField === "name") {
+      if (sort === "name") {
         query =
-          sortOrder === "desc"
+          order === "desc"
             ? query.orderBy(desc(replacementPrograms.name))
             : query.orderBy(asc(replacementPrograms.name));
-      } else if (sortField === "category") {
+      } else if (sort === "category") {
         query =
-          sortOrder === "desc"
+          order === "desc"
             ? query.orderBy(desc(replacementPrograms.category))
             : query.orderBy(asc(replacementPrograms.category));
-      } else if (sortField === "createdAt") {
+      } else if (sort === "createdAt") {
         query =
-          sortOrder === "desc"
+          order === "desc"
             ? query.orderBy(desc(replacementPrograms.createdAt))
             : query.orderBy(asc(replacementPrograms.createdAt));
       }
@@ -113,6 +120,62 @@ export async function GET(request: NextRequest) {
       return createErrorResponse(
         ErrorCode.INTERNAL_SERVER_ERROR,
         "Failed to fetch replacement programs",
+      );
+    }
+  });
+}
+
+/**
+ * POST handler for creating a new replacement program
+ * Creates a replacement program that belongs to the user's organization
+ */
+export async function POST(request: NextRequest) {
+  return withDb(async () => {
+    try {
+      // Require authenticated user with organization
+      const session = await requireAuthWithOrg();
+      const { id: userId, organizationId } = session.user;
+
+      if (!organizationId) {
+        return createErrorResponse(
+          ErrorCode.UNAUTHORIZED,
+          "User must belong to an organization",
+        );
+      }
+
+      // Validate request body
+      const bodyValidation = await validateBody(
+        request,
+        createReplacementProgramSchema,
+      );
+      if (!bodyValidation.success) {
+        return bodyValidation.response;
+      }
+
+      const data = bodyValidation.data;
+
+      // Create new replacement program
+      const [newReplacementProgram] = await db
+        .insert(replacementPrograms)
+        .values({
+          name: data.name,
+          description: data.description,
+          category: data.category,
+          steps: data.steps || {},
+          organizationId: organizationId,
+          createdBy: userId,
+          updatedBy: userId,
+        })
+        .returning();
+
+      return createApiResponse(newReplacementProgram, {
+        status: 201,
+      });
+    } catch (error) {
+      console.error("Error creating replacement program:", error);
+      return createErrorResponse(
+        ErrorCode.INTERNAL_SERVER_ERROR,
+        "Failed to create replacement program",
       );
     }
   });

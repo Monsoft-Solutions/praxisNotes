@@ -1,5 +1,5 @@
 import useSWR from "swr";
-import type { ReplacementProgram } from "@praxisnotes/database";
+import { ReplacementProgram } from "@praxisnotes/database";
 import { ApiResponse } from "@praxisnotes/types";
 import { fetcher } from "@/lib/fetcher";
 
@@ -10,7 +10,6 @@ type ReplacementProgramsParams = {
   category?: string;
   sort?: string;
   order?: "asc" | "desc";
-  targetBehaviorId?: string;
 };
 
 /**
@@ -29,8 +28,6 @@ export function useReplacementPrograms(params?: ReplacementProgramsParams) {
     if (params.category) queryParams.append("category", params.category);
     if (params.sort) queryParams.append("sort", params.sort);
     if (params.order) queryParams.append("order", params.order);
-    if (params.targetBehaviorId)
-      queryParams.append("targetBehaviorId", params.targetBehaviorId);
   }
 
   const queryString = queryParams.toString();
@@ -50,6 +47,23 @@ export function useReplacementPrograms(params?: ReplacementProgramsParams) {
           totalPages: data.pagination.totalPages || 0,
         }
       : null,
+    isLoading,
+    isError: !!error,
+    error,
+    refresh: mutate,
+  };
+}
+
+/**
+ * Hook to fetch a single replacement program by ID
+ */
+export function useReplacementProgram(id: string) {
+  const { data, error, isLoading, mutate } = useSWR<
+    ApiResponse<ReplacementProgram>
+  >(id ? `/api/replacement-programs/${id}` : null, fetcher);
+
+  return {
+    replacementProgram: data?.data,
     isLoading,
     isError: !!error,
     error,
