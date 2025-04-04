@@ -72,6 +72,10 @@ const data = {
           title: "Help",
           url: "/help",
         },
+        {
+          title: "UI Showcase",
+          url: "/ui-showcase",
+        },
       ],
     },
   ] as NavSection[],

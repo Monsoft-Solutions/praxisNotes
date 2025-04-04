@@ -12,13 +12,19 @@ import { ErrorCode } from "@praxisnotes/types";
 import { validateBody } from "@/lib/api/validation";
 import { updateBehaviorSchema } from "../validation";
 
+interface Params {
+  id: string;
+}
+
 /**
  * GET handler to fetch a specific behavior by ID
  */
 export async function GET(
-  request: NextRequest,
-  { params }: { params: { id: string } },
+  _request: NextRequest,
+  { params }: { params: Promise<Params> },
 ) {
+  const { id } = await params;
+
   return withDb(async () => {
     try {
       // Require authenticated user with organization
@@ -36,7 +42,7 @@ export async function GET(
       const [behavior] = await db
         .select()
         .from(behaviors)
-        .where(eq(behaviors.id, params.id))
+        .where(eq(behaviors.id, id))
         .limit(1);
 
       if (!behavior) {
@@ -72,8 +78,10 @@ export async function GET(
  */
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } },
+  { params }: { params: Promise<Params> },
 ) {
+  const { id } = await params;
+
   return withDb(async () => {
     try {
       // Require authenticated user with organization
@@ -97,7 +105,7 @@ export async function PUT(
       const [existingBehavior] = await db
         .select()
         .from(behaviors)
-        .where(eq(behaviors.id, params.id))
+        .where(eq(behaviors.id, id))
         .limit(1);
 
       if (!existingBehavior) {
@@ -133,7 +141,7 @@ export async function PUT(
         })
         .where(
           and(
-            eq(behaviors.id, params.id),
+            eq(behaviors.id, id),
             eq(behaviors.organizationId, organizationId),
           ),
         )
