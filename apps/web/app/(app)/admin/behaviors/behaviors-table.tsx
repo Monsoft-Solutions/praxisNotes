@@ -136,7 +136,7 @@ export function BehaviorsTable() {
   return (
     <div className="space-y-4">
       <Card>
-        <CardHeader className="flex flex-row items-center justify-between">
+        <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-2 sm:space-y-0">
           <CardTitle>Behaviors</CardTitle>
 
           <div className="flex justify-between">
@@ -148,7 +148,7 @@ export function BehaviorsTable() {
         </CardHeader>
         <CardContent>
           {/* Search input */}
-          <form className="flex items-center space-x-2 mb-4 w-md">
+          <form className="flex items-center space-x-2 mb-4 w-full max-w-md">
             <div className="relative flex-1">
               <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
@@ -161,73 +161,101 @@ export function BehaviorsTable() {
             </div>
           </form>
 
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Name</TableHead>
-                <TableHead>Category</TableHead>
-                <TableHead>Scope</TableHead>
-                <TableHead>Description</TableHead>
-                <TableHead className="w-[80px]">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {behaviors.map((behavior: Behavior) => (
-                <TableRow key={behavior.id}>
-                  <TableCell className="font-medium">{behavior.name}</TableCell>
-                  <TableCell>
-                    <Badge variant="outline">
-                      {behavior.category || "Uncategorized"}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>
-                    {behavior.organizationId ? (
-                      <Badge>Organization</Badge>
-                    ) : (
-                      <Badge variant="secondary">Global</Badge>
-                    )}
-                  </TableCell>
-                  <TableCell className="max-w-[300px] truncate">
-                    {behavior.description || "No description"}
-                  </TableCell>
-                  <TableCell>
-                    {behavior.organizationId && (
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" className="h-8 w-8 p-0">
-                            <span className="sr-only">Open menu</span>
-                            <MoreHorizontal className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem
-                            onClick={() => handleEdit(behavior)}
-                          >
-                            Edit
-                          </DropdownMenuItem>
-                          <DropdownMenuSeparator />
-                          <DropdownMenuItem className="text-destructive">
-                            Delete
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    )}
-                  </TableCell>
-                </TableRow>
-              ))}
-
-              {behaviors.length === 0 && (
+          <div className="overflow-x-auto -mx-4 sm:mx-0">
+            <Table>
+              <TableHeader>
                 <TableRow>
-                  <TableCell colSpan={5} className="h-24 text-center">
-                    {isLoading ? "Loading behaviors..." : "No behaviors found"}
-                  </TableCell>
+                  <TableHead>Name</TableHead>
+                  <TableHead className="hidden sm:table-cell">
+                    Category
+                  </TableHead>
+                  <TableHead className="hidden md:table-cell">Scope</TableHead>
+                  <TableHead className="hidden lg:table-cell">
+                    Description
+                  </TableHead>
+                  <TableHead className="w-[80px]">Actions</TableHead>
                 </TableRow>
-              )}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {behaviors.map((behavior: Behavior) => (
+                  <TableRow key={behavior.id}>
+                    <TableCell className="font-medium">
+                      <div>
+                        {behavior.name}
+                        <div className="md:hidden mt-1">
+                          <Badge variant="outline" className="mr-1 text-xs">
+                            {behavior.category || "Uncategorized"}
+                          </Badge>
+                          <span className="sr-only">Scope:</span>
+                          {behavior.organizationId ? (
+                            <Badge className="text-xs">Org</Badge>
+                          ) : (
+                            <Badge variant="secondary" className="text-xs">
+                              Global
+                            </Badge>
+                          )}
+                        </div>
+                        <div className="lg:hidden mt-1 text-xs text-muted-foreground truncate max-w-[200px]">
+                          {behavior.description || "No description"}
+                        </div>
+                      </div>
+                    </TableCell>
+                    <TableCell className="hidden sm:table-cell">
+                      <Badge variant="outline">
+                        {behavior.category || "Uncategorized"}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="hidden md:table-cell">
+                      {behavior.organizationId ? (
+                        <Badge>Organization</Badge>
+                      ) : (
+                        <Badge variant="secondary">Global</Badge>
+                      )}
+                    </TableCell>
+                    <TableCell className="hidden lg:table-cell max-w-[300px] truncate">
+                      {behavior.description || "No description"}
+                    </TableCell>
+                    <TableCell>
+                      {behavior.organizationId && (
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" className="h-8 w-8 p-0">
+                              <span className="sr-only">Open menu</span>
+                              <MoreHorizontal className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem
+                              onClick={() => handleEdit(behavior)}
+                            >
+                              Edit
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem className="text-destructive">
+                              Delete
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      )}
+                    </TableCell>
+                  </TableRow>
+                ))}
+
+                {behaviors.length === 0 && (
+                  <TableRow>
+                    <TableCell colSpan={5} className="h-24 text-center">
+                      {isLoading
+                        ? "Loading behaviors..."
+                        : "No behaviors found"}
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </div>
 
           {pagination && pagination.totalPages > 1 && (
-            <div className="mt-4">
+            <div className="mt-4 overflow-x-auto">
               <PaginationControl
                 page={page}
                 totalPages={pagination.totalPages}

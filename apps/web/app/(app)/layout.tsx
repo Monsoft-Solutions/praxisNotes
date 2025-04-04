@@ -45,7 +45,9 @@ export default function DashboardLayout({
             <ThemeSelector type="dropdown" />
           </div>
         </header>
-        <main className="flex flex-1 flex-col gap-4 p-4">{children}</main>
+        <main className="flex flex-1 flex-col gap-4 p-4 overflow-x-hidden">
+          {children}
+        </main>
       </SidebarInset>
     </SidebarProvider>
   );

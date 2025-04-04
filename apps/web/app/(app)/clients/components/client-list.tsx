@@ -119,7 +119,7 @@ export function ClientList() {
   return (
     <Card>
       <CardHeader>
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div>
             <CardTitle>Clients</CardTitle>
             <CardDescription>
@@ -133,7 +133,7 @@ export function ClientList() {
         </div>
       </CardHeader>
       <CardContent>
-        <form className="flex items-center space-x-2 mb-4 w-md">
+        <form className="flex items-center space-x-2 mb-4 w-full max-w-md">
           <div className="relative flex-1">
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
             <Input
@@ -157,79 +157,110 @@ export function ClientList() {
             No clients found. Add a new client to get started.
           </div>
         ) : (
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Name</TableHead>
-                <TableHead>Email</TableHead>
-                <TableHead>Phone</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead className="w-[80px]"></TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {clients.map((client: Client) => (
-                <TableRow key={client.id}>
-                  <TableCell>
-                    <div className="font-medium">
-                      {client.firstName} {client.lastName}
-                    </div>
-                  </TableCell>
-                  <TableCell>{client.email || "-"}</TableCell>
-                  <TableCell>{client.phone || "-"}</TableCell>
-                  <TableCell>
-                    {client.isActive ? (
-                      <Badge
-                        variant="outline"
-                        className="bg-green-50 text-green-700 border-green-200"
-                      >
-                        Active
-                      </Badge>
-                    ) : (
-                      <Badge
-                        variant="outline"
-                        className="bg-gray-50 text-gray-700 border-gray-200"
-                      >
-                        Inactive
-                      </Badge>
-                    )}
-                  </TableCell>
-                  <TableCell>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className="h-8 w-8 p-0">
-                          <span className="sr-only">Open menu</span>
-                          <MoreHorizontal className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem
-                          onClick={() => router.push(`/clients/${client.id}`)}
-                        >
-                          View details
-                        </DropdownMenuItem>
-                        <DropdownMenuItem
-                          onClick={() =>
-                            router.push(`/clients/${client.id}/edit`)
-                          }
-                        >
-                          Edit
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem className="text-destructive">
-                          Delete
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </TableCell>
+          <div className="overflow-x-auto -mx-4 sm:mx-0">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Name</TableHead>
+                  <TableHead className="hidden sm:table-cell">Email</TableHead>
+                  <TableHead className="hidden md:table-cell">Phone</TableHead>
+                  <TableHead className="hidden md:table-cell">Status</TableHead>
+                  <TableHead className="w-[80px]"></TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {clients.map((client: Client) => (
+                  <TableRow key={client.id}>
+                    <TableCell>
+                      <div>
+                        <div className="font-medium">
+                          {client.firstName} {client.lastName}
+                        </div>
+                        <div className="sm:hidden text-xs text-muted-foreground mt-1">
+                          {client.email || "-"}
+                        </div>
+                        <div className="md:hidden text-xs text-muted-foreground mt-1">
+                          {client.phone || "-"}
+                          <span className="ml-2">
+                            {client.isActive ? (
+                              <Badge
+                                variant="outline"
+                                className="bg-green-50 text-green-700 border-green-200 text-xs"
+                              >
+                                Active
+                              </Badge>
+                            ) : (
+                              <Badge
+                                variant="outline"
+                                className="bg-gray-50 text-gray-700 border-gray-200 text-xs"
+                              >
+                                Inactive
+                              </Badge>
+                            )}
+                          </span>
+                        </div>
+                      </div>
+                    </TableCell>
+                    <TableCell className="hidden sm:table-cell">
+                      {client.email || "-"}
+                    </TableCell>
+                    <TableCell className="hidden md:table-cell">
+                      {client.phone || "-"}
+                    </TableCell>
+                    <TableCell className="hidden md:table-cell">
+                      {client.isActive ? (
+                        <Badge
+                          variant="outline"
+                          className="bg-green-50 text-green-700 border-green-200"
+                        >
+                          Active
+                        </Badge>
+                      ) : (
+                        <Badge
+                          variant="outline"
+                          className="bg-gray-50 text-gray-700 border-gray-200"
+                        >
+                          Inactive
+                        </Badge>
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" className="h-8 w-8 p-0">
+                            <span className="sr-only">Open menu</span>
+                            <MoreHorizontal className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem
+                            onClick={() => router.push(`/clients/${client.id}`)}
+                          >
+                            View details
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={() =>
+                              router.push(`/clients/${client.id}/edit`)
+                            }
+                          >
+                            Edit
+                          </DropdownMenuItem>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem className="text-destructive">
+                            Delete
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
         )}
 
         {pagination && pagination.totalPages > 1 && (
-          <div className="mt-4">
+          <div className="mt-4 overflow-x-auto">
             <PaginationControl
               page={page}
               totalPages={pagination.totalPages}
@@ -241,7 +272,7 @@ export function ClientList() {
           </div>
         )}
       </CardContent>
-      <CardFooter className="flex justify-between">
+      <CardFooter className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
         <div className="text-sm text-muted-foreground">
           Showing {clients.length} clients
           {pagination?.total && ` of ${pagination.total}`}
