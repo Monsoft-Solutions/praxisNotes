@@ -5,6 +5,9 @@ import { seed as seedClients } from "./clients";
 import { seedBehaviors } from "./behaviors.seed";
 import { seedInterventions } from "./interventions.seed";
 import { seedReplacementPrograms } from "./replacement-programs.seed";
+import { seed as seedClientBehaviors } from "./client-behaviors.seed";
+import { seed as seedClientReplacementPrograms } from "./client-replacement-programs.seed";
+import { seed as seedClientInterventions } from "./client-interventions.seed";
 import { db } from "../client";
 import { reset } from "drizzle-seed";
 import * as schema from "../schema";
@@ -20,6 +23,9 @@ export {
   seedBehaviors,
   seedInterventions,
   seedReplacementPrograms,
+  seedClientBehaviors,
+  seedClientReplacementPrograms,
+  seedClientInterventions,
 };
 
 /**
@@ -73,6 +79,13 @@ export async function seedAll() {
       await seedInterventions(organizationResult[0].id, userResult[0].id);
       // Seed replacement programs after behaviors
       await seedReplacementPrograms(organizationResult[0].id, userResult[0].id);
+
+      // Seed client behaviors after clients and behaviors are seeded
+      await seedClientBehaviors();
+      // Seed client replacement programs after client behaviors
+      await seedClientReplacementPrograms();
+      // Seed client interventions after client behaviors
+      await seedClientInterventions();
     } else {
       console.error(
         "Could not seed behaviors, interventions, or replacement programs: missing organization or user",
