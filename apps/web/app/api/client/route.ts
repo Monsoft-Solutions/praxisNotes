@@ -12,13 +12,11 @@ import {
   clientInterventions,
   clientReplacementProgramBehaviors,
   clientInterventionBehaviors,
-  insertClientSchema,
 } from "@praxisnotes/database";
 import { createErrorResponse, createApiResponse } from "@/lib/api";
 import { getSession } from "@/lib/auth";
 import { validateQuery } from "@/lib/api/validation";
 import { getClientQuerySchema, createClientBodySchema } from "./validation";
-import { z } from "zod";
 
 /**
  * GET handler for clients API

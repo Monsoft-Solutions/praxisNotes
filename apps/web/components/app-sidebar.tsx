@@ -70,6 +70,10 @@ const data = {
           title: "Replacement Programs",
           url: "/admin/replacement-programs",
         },
+        {
+          title: "Antecedents",
+          url: "/admin/antecedents",
+        },
       ],
     },
     {

@@ -43,6 +43,13 @@
       "when": 1743787184366,
       "tag": "0005_cuddly_rockslide",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1743797076663,
+      "tag": "0006_powerful_lethal_legion",
+      "breakpoints": true
     }
   ]
 }
