@@ -13,11 +13,13 @@
     "format": "prettier --write \"**/*.{ts,tsx,md}\""
   },
   "dependencies": {
+    "@ai-sdk/anthropic": "^1.2.6",
     "@hookform/resolvers": "^5.0.1",
     "@praxisnotes/database": "workspace:*",
     "@praxisnotes/types": "workspace:*",
     "@types/bcryptjs": "^2.4.6",
     "@workspace/ui": "workspace:*",
+    "ai": "^4.3.0",
     "bcryptjs": "^3.0.2",
     "clsx": "^2.1.1",
     "drizzle-orm": "^0.41.0",
