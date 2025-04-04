@@ -11,7 +11,7 @@ import {
 import { Input } from "@workspace/ui/components/input";
 import { Textarea } from "@workspace/ui/components/textarea";
 import { Button } from "@workspace/ui/components/button";
-import { Plus, Trash2, Check } from "lucide-react";
+import { Plus, Trash2, Check, ChevronsUpDown } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -19,15 +19,38 @@ import {
   CardTitle,
 } from "@workspace/ui/components/card";
 import { Checkbox } from "@workspace/ui/components/checkbox";
-import { cn } from "@workspace/ui/lib/utils";
 import { ClientFormValues } from "./validation";
+import { ReplacementProgram } from "@praxisnotes/database";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+} from "@workspace/ui/components/command";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@workspace/ui/components/popover";
+import { cn } from "@workspace/ui/lib/utils";
+import { useState } from "react";
 
-export function ClientReplacementProgramsForm() {
-  const { control, watch } = useFormContext<ClientFormValues>();
+interface ClientReplacementProgramsFormProps {
+  existingPrograms: ReplacementProgram[];
+}
+
+export function ClientReplacementProgramsForm({
+  existingPrograms = [],
+}: ClientReplacementProgramsFormProps) {
+  const { control, watch, setValue } = useFormContext<ClientFormValues>();
   const { fields, append, remove } = useFieldArray({
     control,
     name: "replacementPrograms",
   });
+
+  // State to track which popover is open
+  const [openPopoverIndex, setOpenPopoverIndex] = useState<number | null>(null);
 
   const behaviors = watch("behaviors");
 
@@ -39,6 +62,29 @@ export function ClientReplacementProgramsForm() {
       behaviorIndices: [],
       isNew: true,
     });
+  };
+
+  // Function to handle keyboard navigation in combobox
+  const handleKeyDown = (
+    e: React.KeyboardEvent,
+    index: number,
+    value: string,
+  ) => {
+    if (e.key === "Enter" && !e.nativeEvent.isComposing) {
+      e.preventDefault();
+
+      // If value entered doesn't match existing program, mark as new
+      const isExisting = existingPrograms.some(
+        (p) => p.name.toLowerCase() === value.toLowerCase(),
+      );
+
+      if (!isExisting && value.trim() !== "") {
+        setValue(`replacementPrograms.${index}.isNew`, true);
+        setOpenPopoverIndex(null);
+      }
+    } else if (e.key === "Escape") {
+      setOpenPopoverIndex(null);
+    }
   };
 
   return (
@@ -94,13 +140,125 @@ export function ClientReplacementProgramsForm() {
                   control={control}
                   name={`replacementPrograms.${index}.name`}
                   render={({ field }) => (
-                    <FormItem>
+                    <FormItem className="flex flex-col">
                       <FormLabel>
                         Name <span className="text-destructive">*</span>
                       </FormLabel>
-                      <FormControl>
-                        <Input placeholder="Enter program name" {...field} />
-                      </FormControl>
+                      <Popover
+                        open={openPopoverIndex === index}
+                        onOpenChange={(open) => {
+                          setOpenPopoverIndex(open ? index : null);
+                        }}
+                      >
+                        <PopoverTrigger asChild>
+                          <FormControl>
+                            <Button
+                              variant="outline"
+                              role="combobox"
+                              data-trigger
+                              onClick={() => setOpenPopoverIndex(index)}
+                              className={cn(
+                                "w-full justify-between",
+                                !field.value && "text-muted-foreground",
+                              )}
+                            >
+                              {field.value
+                                ? field.value
+                                : "Select or create a program"}
+                              <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                            </Button>
+                          </FormControl>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-[300px] p-0">
+                          <Command>
+                            <CommandInput
+                              placeholder="Search or create a program..."
+                              value={field.value || ""}
+                              onValueChange={(value) => {
+                                field.onChange(value);
+                                // Mark as new program if not empty and doesn't match existing programs
+                                const isExisting = existingPrograms.some(
+                                  (p) =>
+                                    p.name.toLowerCase() ===
+                                    value.toLowerCase(),
+                                );
+                                setValue(
+                                  `replacementPrograms.${index}.isNew`,
+                                  value.trim() !== "" && !isExisting,
+                                );
+                              }}
+                              onKeyDown={(e) =>
+                                handleKeyDown(e, index, field.value || "")
+                              }
+                              className="border-none focus:ring-0"
+                            />
+                            <CommandEmpty>
+                              {field.value && field.value.trim() !== "" && (
+                                <div className="flex flex-col items-center py-2">
+                                  <p className="text-sm text-muted-foreground mb-2">
+                                    No existing program found.
+                                  </p>
+                                  <Button
+                                    variant="secondary"
+                                    size="sm"
+                                    onClick={() => {
+                                      setValue(
+                                        `replacementPrograms.${index}.isNew`,
+                                        true,
+                                      );
+                                      setOpenPopoverIndex(null);
+                                    }}
+                                  >
+                                    <Plus className="mr-2 h-4 w-4" />
+                                    Add &quot;{field.value}&quot;
+                                  </Button>
+                                </div>
+                              )}
+                            </CommandEmpty>
+                            <CommandGroup>
+                              {existingPrograms
+                                .filter(
+                                  (program) =>
+                                    !field.value ||
+                                    program.name
+                                      .toLowerCase()
+                                      .includes(field.value.toLowerCase()),
+                                )
+                                .map((program) => (
+                                  <CommandItem
+                                    key={program.id}
+                                    value={program.name}
+                                    onSelect={() => {
+                                      setValue(
+                                        `replacementPrograms.${index}.name`,
+                                        program.name,
+                                      );
+                                      setValue(
+                                        `replacementPrograms.${index}.description`,
+                                        program.description,
+                                      );
+                                      setValue(
+                                        `replacementPrograms.${index}.isNew`,
+                                        false,
+                                      );
+                                      setOpenPopoverIndex(null);
+                                    }}
+                                  >
+                                    <Check
+                                      className={cn(
+                                        "mr-2 h-4 w-4",
+                                        field.value === program.name
+                                          ? "opacity-100"
+                                          : "opacity-0",
+                                      )}
+                                    />
+                                    {program.name}
+                                  </CommandItem>
+                                ))}
+                            </CommandGroup>
+                          </Command>
+                        </PopoverContent>
+                      </Popover>
                       <FormMessage />
                     </FormItem>
                   )}

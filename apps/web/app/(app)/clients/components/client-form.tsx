@@ -13,10 +13,16 @@ import { ClientInterventionsForm } from "./client-interventions-form";
 import { ClientReviewSummary } from "./client-review-summary";
 import { clientFormSchema, ClientFormValues } from "./validation";
 import { useCreateClient, ClientSubmission } from "@/hooks/use-clients";
+import { useBehaviors } from "@/hooks/use-behaviors";
+import { useReplacementPrograms } from "@/hooks/use-replacement-programs";
+import { useInterventions } from "@/hooks/use-interventions";
 
 export function ClientForm() {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { behaviors } = useBehaviors();
+  const { replacementPrograms } = useReplacementPrograms();
+  const { interventions } = useInterventions();
   const { createClientAndRedirect } = useCreateClient();
   const formRef = useRef<HTMLDivElement>(null);
 
@@ -48,17 +54,21 @@ export function ClientForm() {
     {
       title: "Behaviors",
       description: "Add behaviors for this client",
-      content: <ClientBehaviorsForm />,
+      content: <ClientBehaviorsForm existingBehaviors={behaviors} />,
     },
     {
       title: "Programs",
       description: "Add replacement programs",
-      content: <ClientReplacementProgramsForm />,
+      content: (
+        <ClientReplacementProgramsForm existingPrograms={replacementPrograms} />
+      ),
     },
     {
       title: "Interventions",
       description: "Add interventions",
-      content: <ClientInterventionsForm />,
+      content: (
+        <ClientInterventionsForm existingInterventions={interventions} />
+      ),
     },
     {
       title: "Review",

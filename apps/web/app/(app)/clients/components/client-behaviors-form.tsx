@@ -1,7 +1,7 @@
 "use client";
 
 import { useFormContext, useFieldArray } from "react-hook-form";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import {
   FormField,
   FormItem,
@@ -19,7 +19,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@workspace/ui/components/select";
-import { Plus, Trash2, X } from "lucide-react";
+import { Check, ChevronsUpDown, Plus, Trash2, X } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -27,13 +27,37 @@ import {
   CardTitle,
 } from "@workspace/ui/components/card";
 import { ClientFormValues } from "./validation";
+import { Behavior } from "@praxisnotes/database";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+} from "@workspace/ui/components/command";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@workspace/ui/components/popover";
+import { cn } from "@workspace/ui/lib/utils";
 
-export function ClientBehaviorsForm() {
-  const { control, register, watch } = useFormContext<ClientFormValues>();
+interface ClientBehaviorsFormProps {
+  existingBehaviors: Behavior[];
+}
+
+export function ClientBehaviorsForm({
+  existingBehaviors = [],
+}: ClientBehaviorsFormProps) {
+  const { control, register, watch, setValue } =
+    useFormContext<ClientFormValues>();
   const { fields, append, remove } = useFieldArray({
     control,
     name: "behaviors",
   });
+
+  // State to track which popover is open
+  const [openPopoverIndex, setOpenPopoverIndex] = useState<number | null>(null);
 
   const addBehavior = () => {
     append({
@@ -44,6 +68,29 @@ export function ClientBehaviorsForm() {
       topographies: [],
       isNew: true,
     });
+  };
+
+  // Function to handle keyboard navigation in combobox
+  const handleKeyDown = (
+    e: React.KeyboardEvent,
+    index: number,
+    value: string,
+  ) => {
+    if (e.key === "Enter" && !e.nativeEvent.isComposing) {
+      e.preventDefault();
+
+      // If value entered doesn't match existing behavior, mark as new
+      const isExisting = existingBehaviors.some(
+        (b) => b.name.toLowerCase() === value.toLowerCase(),
+      );
+
+      if (!isExisting && value.trim() !== "") {
+        setValue(`behaviors.${index}.isNew`, true);
+        setOpenPopoverIndex(null);
+      }
+    } else if (e.key === "Escape") {
+      setOpenPopoverIndex(null);
+    }
   };
 
   return (
@@ -93,13 +140,125 @@ export function ClientBehaviorsForm() {
                     control={control}
                     name={`behaviors.${index}.name`}
                     render={({ field }) => (
-                      <FormItem>
+                      <FormItem className="flex flex-col">
                         <FormLabel>
                           Name <span className="text-destructive">*</span>
                         </FormLabel>
-                        <FormControl>
-                          <Input placeholder="Enter behavior name" {...field} />
-                        </FormControl>
+                        <Popover
+                          open={openPopoverIndex === index}
+                          onOpenChange={(open) => {
+                            setOpenPopoverIndex(open ? index : null);
+                          }}
+                        >
+                          <PopoverTrigger asChild>
+                            <FormControl>
+                              <Button
+                                variant="outline"
+                                role="combobox"
+                                data-trigger
+                                onClick={() => setOpenPopoverIndex(index)}
+                                className={cn(
+                                  "w-full justify-between",
+                                  !field.value && "text-muted-foreground",
+                                )}
+                              >
+                                {field.value
+                                  ? field.value
+                                  : "Select or create a behavior"}
+                                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                              </Button>
+                            </FormControl>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-[300px] p-0">
+                            <Command>
+                              <CommandInput
+                                placeholder="Search or create a behavior..."
+                                value={field.value || ""}
+                                onValueChange={(value) => {
+                                  field.onChange(value);
+                                  // Mark as new behavior if not empty and doesn't match existing behaviors
+                                  const isExisting = existingBehaviors.some(
+                                    (b) =>
+                                      b.name.toLowerCase() ===
+                                      value.toLowerCase(),
+                                  );
+                                  setValue(
+                                    `behaviors.${index}.isNew`,
+                                    value.trim() !== "" && !isExisting,
+                                  );
+                                }}
+                                onKeyDown={(e) =>
+                                  handleKeyDown(e, index, field.value || "")
+                                }
+                                className="border-none focus:ring-0"
+                              />
+                              <CommandEmpty>
+                                {field.value && field.value.trim() !== "" && (
+                                  <div className="flex flex-col items-center py-2">
+                                    <p className="text-sm text-muted-foreground mb-2">
+                                      No existing behavior found.
+                                    </p>
+                                    <Button
+                                      variant="secondary"
+                                      size="sm"
+                                      onClick={() => {
+                                        setValue(
+                                          `behaviors.${index}.isNew`,
+                                          true,
+                                        );
+                                        setOpenPopoverIndex(null);
+                                      }}
+                                    >
+                                      <Plus className="mr-2 h-4 w-4" />
+                                      Add &quot;{field.value}&quot;
+                                    </Button>
+                                  </div>
+                                )}
+                              </CommandEmpty>
+                              <CommandGroup>
+                                {existingBehaviors
+                                  .filter(
+                                    (behavior) =>
+                                      !field.value ||
+                                      behavior.name
+                                        .toLowerCase()
+                                        .includes(field.value.toLowerCase()),
+                                  )
+                                  .map((behavior) => (
+                                    <CommandItem
+                                      key={behavior.id}
+                                      value={behavior.name}
+                                      onSelect={() => {
+                                        setValue(
+                                          `behaviors.${index}.name`,
+                                          behavior.name,
+                                        );
+                                        setValue(
+                                          `behaviors.${index}.description`,
+                                          behavior.description,
+                                        );
+                                        setValue(
+                                          `behaviors.${index}.isNew`,
+                                          false,
+                                        );
+                                        setOpenPopoverIndex(null);
+                                      }}
+                                    >
+                                      <Check
+                                        className={cn(
+                                          "mr-2 h-4 w-4",
+                                          field.value === behavior.name
+                                            ? "opacity-100"
+                                            : "opacity-0",
+                                        )}
+                                      />
+                                      {behavior.name}
+                                    </CommandItem>
+                                  ))}
+                              </CommandGroup>
+                            </Command>
+                          </PopoverContent>
+                        </Popover>
                         <FormMessage />
                       </FormItem>
                     )}

@@ -1,7 +1,6 @@
 "use client";
 
 import { useFormContext, useFieldArray } from "react-hook-form";
-import { useState } from "react";
 import {
   FormField,
   FormItem,
@@ -12,7 +11,7 @@ import {
 import { Input } from "@workspace/ui/components/input";
 import { Textarea } from "@workspace/ui/components/textarea";
 import { Button } from "@workspace/ui/components/button";
-import { Plus, Trash2, Check } from "lucide-react";
+import { Plus, Trash2, Check, ChevronsUpDown } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -20,15 +19,38 @@ import {
   CardTitle,
 } from "@workspace/ui/components/card";
 import { Checkbox } from "@workspace/ui/components/checkbox";
-import { cn } from "@workspace/ui/lib/utils";
 import { ClientFormValues } from "./validation";
+import { Intervention } from "@praxisnotes/database";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+} from "@workspace/ui/components/command";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@workspace/ui/components/popover";
+import { cn } from "@workspace/ui/lib/utils";
+import { useState } from "react";
 
-export function ClientInterventionsForm() {
-  const { control, watch } = useFormContext<ClientFormValues>();
+interface ClientInterventionsFormProps {
+  existingInterventions: Intervention[];
+}
+
+export function ClientInterventionsForm({
+  existingInterventions = [],
+}: ClientInterventionsFormProps) {
+  const { control, watch, setValue } = useFormContext<ClientFormValues>();
   const { fields, append, remove } = useFieldArray({
     control,
     name: "interventions",
   });
+
+  // State to track which popover is open
+  const [openPopoverIndex, setOpenPopoverIndex] = useState<number | null>(null);
 
   const behaviors = watch("behaviors");
 
@@ -39,6 +61,29 @@ export function ClientInterventionsForm() {
       behaviorIndices: [],
       isNew: true,
     });
+  };
+
+  // Function to handle keyboard navigation in combobox
+  const handleKeyDown = (
+    e: React.KeyboardEvent,
+    index: number,
+    value: string,
+  ) => {
+    if (e.key === "Enter" && !e.nativeEvent.isComposing) {
+      e.preventDefault();
+
+      // If value entered doesn't match existing intervention, mark as new
+      const isExisting = existingInterventions.some(
+        (i) => i.name.toLowerCase() === value.toLowerCase(),
+      );
+
+      if (!isExisting && value.trim() !== "") {
+        setValue(`interventions.${index}.isNew`, true);
+        setOpenPopoverIndex(null);
+      }
+    } else if (e.key === "Escape") {
+      setOpenPopoverIndex(null);
+    }
   };
 
   return (
@@ -93,16 +138,125 @@ export function ClientInterventionsForm() {
                   control={control}
                   name={`interventions.${index}.name`}
                   render={({ field }) => (
-                    <FormItem>
+                    <FormItem className="flex flex-col">
                       <FormLabel>
                         Name <span className="text-destructive">*</span>
                       </FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder="Enter intervention name"
-                          {...field}
-                        />
-                      </FormControl>
+                      <Popover
+                        open={openPopoverIndex === index}
+                        onOpenChange={(open) => {
+                          setOpenPopoverIndex(open ? index : null);
+                        }}
+                      >
+                        <PopoverTrigger asChild>
+                          <FormControl>
+                            <Button
+                              variant="outline"
+                              role="combobox"
+                              data-trigger
+                              onClick={() => setOpenPopoverIndex(index)}
+                              className={cn(
+                                "w-full justify-between",
+                                !field.value && "text-muted-foreground",
+                              )}
+                            >
+                              {field.value
+                                ? field.value
+                                : "Select or create an intervention"}
+                              <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                            </Button>
+                          </FormControl>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-[300px] p-0">
+                          <Command>
+                            <CommandInput
+                              placeholder="Search or create an intervention..."
+                              value={field.value || ""}
+                              onValueChange={(value) => {
+                                field.onChange(value);
+                                // Mark as new intervention if not empty and doesn't match existing interventions
+                                const isExisting = existingInterventions.some(
+                                  (i) =>
+                                    i.name.toLowerCase() ===
+                                    value.toLowerCase(),
+                                );
+                                setValue(
+                                  `interventions.${index}.isNew`,
+                                  value.trim() !== "" && !isExisting,
+                                );
+                              }}
+                              onKeyDown={(e) =>
+                                handleKeyDown(e, index, field.value || "")
+                              }
+                              className="border-none focus:ring-0"
+                            />
+                            <CommandEmpty>
+                              {field.value && field.value.trim() !== "" && (
+                                <div className="flex flex-col items-center py-2">
+                                  <p className="text-sm text-muted-foreground mb-2">
+                                    No existing intervention found.
+                                  </p>
+                                  <Button
+                                    variant="secondary"
+                                    size="sm"
+                                    onClick={() => {
+                                      setValue(
+                                        `interventions.${index}.isNew`,
+                                        true,
+                                      );
+                                      setOpenPopoverIndex(null);
+                                    }}
+                                  >
+                                    <Plus className="mr-2 h-4 w-4" />
+                                    Add &quot;{field.value}&quot;
+                                  </Button>
+                                </div>
+                              )}
+                            </CommandEmpty>
+                            <CommandGroup>
+                              {existingInterventions
+                                .filter(
+                                  (intervention) =>
+                                    !field.value ||
+                                    intervention.name
+                                      .toLowerCase()
+                                      .includes(field.value.toLowerCase()),
+                                )
+                                .map((intervention) => (
+                                  <CommandItem
+                                    key={intervention.id}
+                                    value={intervention.name}
+                                    onSelect={() => {
+                                      setValue(
+                                        `interventions.${index}.name`,
+                                        intervention.name,
+                                      );
+                                      setValue(
+                                        `interventions.${index}.description`,
+                                        intervention.description,
+                                      );
+                                      setValue(
+                                        `interventions.${index}.isNew`,
+                                        false,
+                                      );
+                                      setOpenPopoverIndex(null);
+                                    }}
+                                  >
+                                    <Check
+                                      className={cn(
+                                        "mr-2 h-4 w-4",
+                                        field.value === intervention.name
+                                          ? "opacity-100"
+                                          : "opacity-0",
+                                      )}
+                                    />
+                                    {intervention.name}
+                                  </CommandItem>
+                                ))}
+                            </CommandGroup>
+                          </Command>
+                        </PopoverContent>
+                      </Popover>
                       <FormMessage />
                     </FormItem>
                   )}
