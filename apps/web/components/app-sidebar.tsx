@@ -55,12 +55,34 @@ const data = {
       ],
     },
     {
+      title: "Admin",
+      url: "#",
+      items: [
+        {
+          title: "Behaviors",
+          url: "/admin/behaviors",
+        },
+        {
+          title: "Interventions",
+          url: "/admin/interventions",
+        },
+        {
+          title: "Replacement Programs",
+          url: "/admin/replacement-programs",
+        },
+      ],
+    },
+    {
       title: "Support",
       url: "#",
       items: [
         {
           title: "Help",
           url: "/help",
+        },
+        {
+          title: "UI Showcase",
+          url: "/ui-showcase",
         },
       ],
     },

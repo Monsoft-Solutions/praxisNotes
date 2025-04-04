@@ -6,10 +6,10 @@ import { ApiError } from "./error.type";
 export type ApiResponse<T> = {
   data?: T | undefined;
   error?: ApiError | undefined;
-  meta?:
+  pagination?:
     | {
         page?: number;
-        perPage?: number;
+        limit?: number;
         total?: number;
         totalPages?: number;
       }
@@ -21,7 +21,7 @@ export type ApiResponse<T> = {
  */
 export type PaginationParams = {
   page?: number;
-  perPage?: number;
+  limit?: number;
 };
 
 /**

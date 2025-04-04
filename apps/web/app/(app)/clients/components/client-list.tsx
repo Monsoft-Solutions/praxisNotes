@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Input } from "@workspace/ui/components/input";
 import { Button } from "@workspace/ui/components/button";
 import {
@@ -28,9 +28,10 @@ import {
   DropdownMenuTrigger,
 } from "@workspace/ui/components/dropdown-menu";
 import { MoreHorizontal, Plus, Search } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import useSWR from "swr";
 import { Client } from "@praxisnotes/database";
+import { PaginationControl } from "@workspace/ui/components/pagination-control";
 
 /**
  * Custom fetcher for SWR to handle API requests
@@ -48,28 +49,77 @@ const fetcher = async (url: string) => {
 
 export function ClientList() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [searchQuery, setSearchQuery] = useState("");
 
-  const apiUrl = searchQuery
-    ? `/api/client?search=${encodeURIComponent(searchQuery)}`
-    : "/api/client";
-
-  const { data, error, isLoading } = useSWR<{ data: Client[] }>(
-    apiUrl,
-    fetcher,
+  // Pagination state
+  const pageParam = searchParams.get("page");
+  const limitParam = searchParams.get("limit");
+  const [page, setPage] = useState<number>(pageParam ? parseInt(pageParam) : 1);
+  const [limit, setLimit] = useState<number>(
+    limitParam ? parseInt(limitParam) : 10,
   );
 
-  const clients = data?.data || [];
+  // Build API URL with search and pagination params
+  const apiUrl = `/api/client?${searchQuery ? `search=${encodeURIComponent(searchQuery)}&` : ""}page=${page}&limit=${limit}`;
 
-  const handleSearch = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    // The search is automatically triggered by the SWR dependency
+  const { data, error, isLoading } = useSWR<{
+    data: Client[];
+    pagination?: { total: number; totalPages: number };
+  }>(apiUrl, fetcher);
+
+  const clients = data?.data || [];
+  const pagination = data?.pagination;
+
+  // Update URL when page, limit or search changes
+  useEffect(() => {
+    const current = new URLSearchParams(Array.from(searchParams.entries()));
+
+    if (searchQuery) {
+      current.set("search", searchQuery);
+    } else {
+      current.delete("search");
+    }
+
+    if (page > 1) {
+      current.set("page", page.toString());
+    } else {
+      current.delete("page");
+    }
+
+    if (limit !== 10) {
+      current.set("limit", limit.toString());
+    } else {
+      current.delete("limit");
+    }
+
+    const search = current.toString();
+    const query = search ? `?${search}` : "";
+
+    router.push(`${window.location.pathname}${query}`, { scroll: false });
+  }, [page, limit, searchQuery, router, searchParams]);
+
+  const handleSearch = (e: string) => {
+    setPage(1);
+
+    setSearchQuery(e);
+    // Reset to page 1 when searching
+  };
+
+  const handlePageChange = (newPage: number) => {
+    setPage(newPage);
+  };
+
+  const handleLimitChange = (value: number) => {
+    setLimit(value);
+    // Reset to page 1 when changing items per page
+    setPage(1);
   };
 
   return (
     <Card>
       <CardHeader>
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div>
             <CardTitle>Clients</CardTitle>
             <CardDescription>
@@ -83,10 +133,7 @@ export function ClientList() {
         </div>
       </CardHeader>
       <CardContent>
-        <form
-          onSubmit={handleSearch}
-          className="flex items-center space-x-2 mb-4"
-        >
+        <form className="flex items-center space-x-2 mb-4 w-full max-w-md">
           <div className="relative flex-1">
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
             <Input
@@ -94,10 +141,9 @@ export function ClientList() {
               placeholder="Search clients..."
               className="pl-8"
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={(e) => handleSearch(e.target.value)}
             />
           </div>
-          <Button type="submit">Search</Button>
         </form>
 
         {isLoading ? (
@@ -111,80 +157,107 @@ export function ClientList() {
             No clients found. Add a new client to get started.
           </div>
         ) : (
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Name</TableHead>
-                <TableHead>Email</TableHead>
-                <TableHead>Phone</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead className="w-[80px]"></TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {clients.map((client: Client) => (
-                <TableRow key={client.id}>
-                  <TableCell>
-                    <div className="font-medium">
-                      {client.firstName} {client.lastName}
-                    </div>
-                  </TableCell>
-                  <TableCell>{client.email || "-"}</TableCell>
-                  <TableCell>{client.phone || "-"}</TableCell>
-                  <TableCell>
-                    {client.isActive ? (
-                      <Badge
-                        variant="outline"
-                        className="bg-green-50 text-green-700 border-green-200"
-                      >
-                        Active
-                      </Badge>
-                    ) : (
-                      <Badge
-                        variant="outline"
-                        className="bg-gray-50 text-gray-700 border-gray-200"
-                      >
-                        Inactive
-                      </Badge>
-                    )}
-                  </TableCell>
-                  <TableCell>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className="h-8 w-8 p-0">
-                          <span className="sr-only">Open menu</span>
-                          <MoreHorizontal className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem
-                          onClick={() => router.push(`/clients/${client.id}`)}
-                        >
-                          View details
-                        </DropdownMenuItem>
-                        <DropdownMenuItem
-                          onClick={() =>
-                            router.push(`/clients/${client.id}/edit`)
-                          }
-                        >
-                          Edit
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem className="text-destructive">
-                          Delete
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </TableCell>
+          <div className="overflow-x-auto -mx-4 sm:mx-0">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Name</TableHead>
+                  <TableHead className="hidden sm:table-cell">Email</TableHead>
+                  <TableHead className="hidden md:table-cell">Phone</TableHead>
+                  <TableHead className="hidden md:table-cell">Status</TableHead>
+                  <TableHead className="w-[80px]"></TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {clients.map((client: Client) => (
+                  <TableRow key={client.id}>
+                    <TableCell>
+                      <div>
+                        <div className="font-medium">
+                          {client.firstName} {client.lastName}
+                        </div>
+                      </div>
+                    </TableCell>
+                    <TableCell className="hidden md:table-cell">
+                      {client.isActive ? (
+                        <Badge
+                          variant="outline"
+                          className="bg-green-50 text-green-700 border-green-200"
+                        >
+                          Active
+                        </Badge>
+                      ) : (
+                        <Badge
+                          variant="outline"
+                          className="bg-gray-50 text-gray-700 border-gray-200"
+                        >
+                          Inactive
+                        </Badge>
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" className="h-8 w-8 p-0">
+                            <span className="sr-only">Open menu</span>
+                            <MoreHorizontal className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem
+                            onClick={() => router.push(`/clients/${client.id}`)}
+                          >
+                            View details
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={() =>
+                              router.push(`/clients/${client.id}/edit`)
+                            }
+                          >
+                            Edit
+                          </DropdownMenuItem>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem className="text-destructive">
+                            Delete
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+        )}
+
+        {pagination && pagination.totalPages > 1 && (
+          <div className="mt-4 overflow-x-auto">
+            <PaginationControl
+              page={page}
+              totalPages={pagination.totalPages}
+              limit={limit}
+              onPageChange={handlePageChange}
+              onLimitChange={handleLimitChange}
+              showLimitDropdown={false}
+            />
+          </div>
         )}
       </CardContent>
-      <CardFooter className="flex justify-between">
+      <CardFooter className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
         <div className="text-sm text-muted-foreground">
           Showing {clients.length} clients
+          {pagination?.total && ` of ${pagination.total}`}
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="text-sm text-muted-foreground">Items per page:</span>
+          <PaginationControl
+            page={page}
+            totalPages={pagination?.totalPages || 1}
+            limit={limit}
+            onPageChange={handlePageChange}
+            onLimitChange={handleLimitChange}
+            showLimitDropdown={true}
+          />
         </div>
       </CardFooter>
     </Card>

@@ -20,9 +20,6 @@ export const clients = pgTable("clients", {
   id: uuid("id").defaultRandom().primaryKey(),
   firstName: varchar("first_name", { length: 255 }).notNull(),
   lastName: varchar("last_name", { length: 255 }).notNull(),
-  email: varchar("email", { length: 255 }),
-  phone: varchar("phone", { length: 50 }),
-  address: text("address"),
   notes: text("notes"),
   // Reference to the organization that owns this client
   organizationId: uuid("organization_id")
@@ -54,9 +51,6 @@ export type NewClient = typeof clients.$inferInsert;
 export const insertClientSchema = createInsertSchema(clients, {
   firstName: z.string().min(1).max(255),
   lastName: z.string().min(1).max(255),
-  email: z.string().email().optional(),
-  phone: z.string().optional(),
-  address: z.string().optional(),
   notes: z.string().optional(),
   organizationId: z.string().uuid(),
   isActive: z.boolean().optional(),

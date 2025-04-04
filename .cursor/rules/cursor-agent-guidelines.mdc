@@ -81,4 +81,13 @@ This document outlines all available rules and guidelines for the AI assistant t
    - Multiple rules may apply to a single task; in such cases, combine the guidance from all relevant rules
    - For example, when creating a new API endpoint that accesses the database, follow both api-routes.rules and database.rules
 
+## After generate code
+
+- After a sucessful code generation, run `pnpm run build` in order to ensure we haven't broke anything
+
+## Adding and using components
+- Always check if the component exist in the ui package or the component folder
+- For shadcn component, always go the web project, and install it like this: `npx shadcn@latest add progress`
+- For importing the component, check how we do it
+
 The AI assistant should fetch the full rule content when necessary to ensure complete understanding and proper implementation.

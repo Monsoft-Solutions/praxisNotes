@@ -13,6 +13,7 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@workspace/ui/components/sidebar";
+import { ThemeSelector } from "@workspace/ui/components/theme-selector";
 
 export default function DashboardLayout({
   children,
@@ -40,8 +41,13 @@ export default function DashboardLayout({
               </BreadcrumbItem>
             </BreadcrumbList>
           </Breadcrumb>
+          <div className="ml-auto flex items-center gap-2">
+            <ThemeSelector type="dropdown" />
+          </div>
         </header>
-        <main className="flex flex-1 flex-col gap-4 p-4">{children}</main>
+        <main className="flex flex-1 flex-col gap-4 p-4 overflow-x-hidden">
+          {children}
+        </main>
       </SidebarInset>
     </SidebarProvider>
   );

@@ -8,7 +8,8 @@
     "lint": "turbo lint",
     "format": "turbo format",
     "prepare": "husky",
-    "check-types": "turbo check-types"
+    "check-types": "turbo check-types",
+    "validate": "pnpm run format && turbo run lint check-types"
   },
   "devDependencies": {
     "@workspace/eslint-config": "workspace:*",

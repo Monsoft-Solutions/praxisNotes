@@ -18,27 +18,27 @@ import {
  */
 export function createSuccessResponse<T>(
   data: T,
-  meta?: Record<string, unknown>,
+  pagination?: Record<string, unknown>,
 ): NextResponse<ApiDataResponse<T>> {
   return NextResponse.json({
     data,
-    meta: meta ?? {},
+    pagination: pagination ?? {},
   });
 }
 
 /**
  * Create a success response for lists with pagination
  * @param data Array of data items
- * @param meta Pagination metadata
+ * @param pagination Pagination data
  * @returns NextResponse with standardized format
  */
 export function createListResponse<T>(
   data: T[],
-  meta: PaginationMeta,
+  pagination: PaginationMeta,
 ): NextResponse<ApiListResponse<T>> {
   return NextResponse.json({
     data,
-    meta,
+    pagination,
   });
 }
 
@@ -144,12 +144,12 @@ export function createApiResponse<T>(
   data: T,
   options?: {
     status?: number;
-    meta?: ApiResponse<T>["meta"];
+    pagination?: ApiResponse<T>["pagination"];
   },
 ): NextResponse {
   const response = {
     data,
-    meta: options?.meta,
+    pagination: options?.pagination,
   };
 
   return NextResponse.json(response, { status: options?.status || 200 });

@@ -132,7 +132,7 @@ Standardized response structures for API calls:
 export type ApiResponse<T> = {
   data?: T;
   error?: ApiError;
-  meta?: {
+  pagination?: {
     page?: number;
     perPage?: number;
     total?: number;
