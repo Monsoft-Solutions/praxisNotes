@@ -194,9 +194,6 @@ export type NewClientIntervention = Omit<
 - First Name (required)
 - Last Name (required)
 - Gender (required, select dropdown)
-- Email (optional)
-- Phone (optional)
-- Address (optional)
 - Notes (optional)
 
 ### Step 2: Client Behaviors
@@ -232,53 +229,6 @@ For each intervention:
 
 Users can add multiple interventions.
 
-## Form State Management
-
-```typescript
-// Form state type
-export type ClientFormState = {
-  // Step 1: Basic Info
-  firstName: string;
-  lastName: string;
-  gender: "male" | "female" | "other";
-  email?: string;
-  phone?: string;
-  address?: string;
-  notes?: string;
-
-  // Step 2: Behaviors
-  behaviors: {
-    name: string;
-    description: string;
-    baseline: number;
-    type: "frequency" | "percentage";
-    topographies: string[];
-    isNew?: boolean;
-  }[];
-
-  // Step 3: Replacement Programs
-  replacementPrograms: {
-    name: string;
-    description: string;
-    baseline: number;
-    behaviorIndices: number[]; // Indices of behaviors from Step 2
-    isNew?: boolean;
-  }[];
-
-  // Step 4: Interventions
-  interventions: {
-    name: string;
-    description: string;
-    behaviorIndices: number[]; // Indices of behaviors from Step 2
-    isNew?: boolean;
-  }[];
-
-  // Form progression
-  currentStep: number;
-  isComplete: boolean;
-};
-```
-
 ## API Routes
 
 ### 1. Create Client with All Related Data
@@ -291,73 +241,6 @@ This endpoint will handle creating:
 2. All client behaviors
 3. All client replacement programs and their behavior associations
 4. All client interventions and their behavior associations
-
-### 2. Lookup Routes
-
-- `GET /api/behaviors/search?q=query` - Search behaviors by name
-- `GET /api/replacement-programs/search?q=query` - Search replacement programs by name
-- `GET /api/interventions/search?q=query` - Search interventions by name
-
-## UI Components
-
-### 1. Multi-Step Form Container
-
-```tsx
-// components/clients/ClientFormContainer.tsx
-import { useState } from "react";
-import { BasicInfoForm } from "./BasicInfoForm";
-import { BehaviorsForm } from "./BehaviorsForm";
-import { ReplacementProgramsForm } from "./ReplacementProgramsForm";
-import { InterventionsForm } from "./InterventionsForm";
-import { FormStepper } from "./FormStepper";
-import { ClientFormState } from "../../types/client-form.type";
-
-export function ClientFormContainer() {
-  const [formState, setFormState] = useState<ClientFormState>({
-    firstName: "",
-    lastName: "",
-    gender: "male",
-    behaviors: [],
-    replacementPrograms: [],
-    interventions: [],
-    currentStep: 1,
-    isComplete: false,
-  });
-
-  // Step rendering and navigation logic
-
-  return (
-    <div className="space-y-6">
-      <FormStepper currentStep={formState.currentStep} />
-
-      {formState.currentStep === 1 && (
-        <BasicInfoForm
-          formState={formState}
-          updateFormState={setFormState}
-          onNext={() => setFormState({ ...formState, currentStep: 2 })}
-        />
-      )}
-
-      {/* Other step forms */}
-
-      {/* Navigation buttons */}
-    </div>
-  );
-}
-```
-
-### 2. Step Components
-
-- `BasicInfoForm.tsx` - Step 1 form
-- `BehaviorsForm.tsx` - Step 2 form with dynamic behavior addition
-- `ReplacementProgramsForm.tsx` - Step 3 form for replacement programs
-- `InterventionsForm.tsx` - Step 4 form for interventions
-
-### 3. Reusable Components
-
-- `SearchableDropdown.tsx` - Dropdown with search and create functionality
-- `DynamicInputList.tsx` - Component for managing lists of inputs (like topographies)
-- `FormStepper.tsx` - Step indicator for multi-step form
 
 ## Conclusion
 

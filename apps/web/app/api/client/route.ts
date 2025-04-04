@@ -66,7 +66,6 @@ export async function GET(request: NextRequest) {
           or(
             ilike(clients.firstName, searchPattern),
             ilike(clients.lastName, searchPattern),
-            ilike(clients.email || "", searchPattern),
           ),
         );
 
@@ -81,7 +80,6 @@ export async function GET(request: NextRequest) {
           or(
             ilike(clients.firstName, searchPattern),
             ilike(clients.lastName, searchPattern),
-            ilike(clients.email || "", searchPattern),
           ),
         )
         .limit(limit)

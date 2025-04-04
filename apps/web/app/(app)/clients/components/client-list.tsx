@@ -176,36 +176,7 @@ export function ClientList() {
                         <div className="font-medium">
                           {client.firstName} {client.lastName}
                         </div>
-                        <div className="sm:hidden text-xs text-muted-foreground mt-1">
-                          {client.email || "-"}
-                        </div>
-                        <div className="md:hidden text-xs text-muted-foreground mt-1">
-                          {client.phone || "-"}
-                          <span className="ml-2">
-                            {client.isActive ? (
-                              <Badge
-                                variant="outline"
-                                className="bg-green-50 text-green-700 border-green-200 text-xs"
-                              >
-                                Active
-                              </Badge>
-                            ) : (
-                              <Badge
-                                variant="outline"
-                                className="bg-gray-50 text-gray-700 border-gray-200 text-xs"
-                              >
-                                Inactive
-                              </Badge>
-                            )}
-                          </span>
-                        </div>
                       </div>
-                    </TableCell>
-                    <TableCell className="hidden sm:table-cell">
-                      {client.email || "-"}
-                    </TableCell>
-                    <TableCell className="hidden md:table-cell">
-                      {client.phone || "-"}
                     </TableCell>
                     <TableCell className="hidden md:table-cell">
                       {client.isActive ? (
