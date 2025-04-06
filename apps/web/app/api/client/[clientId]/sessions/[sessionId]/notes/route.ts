@@ -1,13 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db, withDb } from "@/lib/db";
 import { sessions, sessionNotes } from "@praxisnotes/database";
-import { NotesGenerationRequest } from "@praxisnotes/types";
+import { NotesGenerationRequest, SessionFormData } from "@praxisnotes/types";
 import { createApiResponse, createErrorResponse } from "@/lib/api";
 import { requireAuthWithOrg } from "@/lib/auth/auth";
 import { ErrorCode } from "@praxisnotes/types";
 import { eq } from "drizzle-orm";
 import { anthropic } from "@ai-sdk/anthropic";
 import { generateText } from "ai";
+import { createSessionNotesPrompt } from "@/lib/ai";
 
 /**
  * POST handler for generating notes
@@ -62,7 +63,7 @@ export async function POST(
       }
 
       // Generate notes using AI
-      const formData = sessionData.formData as any;
+      const formData = sessionData.formData as SessionFormData;
       const generatedNotes = await generateSessionNotes(formData);
 
       // Save generated notes
@@ -203,9 +204,9 @@ export async function PUT(
 }
 
 // Helper function to generate notes using Anthropic
-async function generateSessionNotes(sessionData: any) {
-  // Format the session data into a structured prompt
-  const prompt = createSessionPrompt(sessionData);
+async function generateSessionNotes(sessionData: SessionFormData) {
+  // Use the prompt from our dedicated module
+  const prompt = createSessionNotesPrompt(sessionData);
 
   try {
     const { text, reasoning } = await generateText({
@@ -227,34 +228,4 @@ async function generateSessionNotes(sessionData: any) {
     console.error("Error generating notes:", error);
     throw error;
   }
-}
-
-// Create a structured prompt from session data
-function createSessionPrompt(sessionData: any): string {
-  return `
-    Generate professional and detailed session notes based on the following information:
-    
-    Date: ${sessionData.sessionDate}
-    Time: ${sessionData.startTime} - ${sessionData.endTime}
-    Location: ${sessionData.location}
-    Participants: ${sessionData.presentParticipants.join(", ")}
-    Environmental Changes: ${sessionData.environmentalChanges.join(", ")}
-    
-    ${sessionData.abcEntries
-      .map(
-        (abc: any, index: number) => `
-    ABC Entry #${index + 1}:
-    - Activity/Antecedent: ${abc.activityAntecedent}
-    - Behaviors: ${abc.behaviors.join(", ")}
-    - Interventions: ${abc.interventions.join(", ")}
-    - Replacement Programs: ${abc.replacementPrograms.join(", ")}
-    `,
-      )
-      .join("\n")}
-    
-    Reinforcers: ${sessionData.reinforcers.join(", ")}
-    Overall Valuation: ${sessionData.valuation}
-    
-    Please format the notes in a professional clinical style with proper headings, paragraphs, and bullet points as appropriate.
-  `;
 }
