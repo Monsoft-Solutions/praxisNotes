@@ -10,14 +10,14 @@ export const metadata: Metadata = {
   description: "Edit an existing therapy session",
 };
 
-interface PageProps {
-  params: {
+export default async function EditSessionPage({
+  params,
+}: {
+  params: Promise<{
     clientId: string;
     sessionId: string;
-  };
-}
-
-export default async function EditSessionPage({ params }: PageProps) {
+  }>;
+}) {
   const { clientId, sessionId } = await params;
 
   // Fetch session details

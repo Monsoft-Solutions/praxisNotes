@@ -10,13 +10,14 @@ export const metadata: Metadata = {
   description: "Create a new therapy session",
 };
 
-interface PageProps {
-  params: {
+export default async function NewSessionPage({
+  params,
+}: {
+  params: Promise<{
     clientId: string;
-  };
-}
-
-export default async function NewSessionPage({ params }: PageProps) {
+    sessionId: string;
+  }>;
+}) {
   const { clientId } = await params;
 
   // Fetch client data to get the name

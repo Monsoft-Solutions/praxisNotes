@@ -16,7 +16,7 @@ import { eq, desc } from "drizzle-orm";
  */
 export async function POST(
   request: NextRequest,
-  { params }: { params: { clientId: string } },
+  { params }: { params: Promise<{ clientId: string }> },
 ) {
   return withDb(async () => {
     try {
@@ -100,7 +100,7 @@ export async function POST(
  */
 export async function GET(
   request: NextRequest,
-  { params }: { params: { clientId: string } },
+  { params }: { params: Promise<{ clientId: string }> },
 ) {
   return withDb(async () => {
     try {

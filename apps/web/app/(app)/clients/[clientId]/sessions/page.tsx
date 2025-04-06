@@ -12,12 +12,6 @@ export const metadata: Metadata = {
   description: "Manage and view client sessions",
 };
 
-interface PageProps {
-  params: {
-    clientId: string;
-  };
-}
-
 interface Session {
   id: string;
   sessionDate: Date;
@@ -28,7 +22,14 @@ interface Session {
   formData: any;
 }
 
-export default async function SessionsPage({ params }: PageProps) {
+export default async function SessionsPage({
+  params,
+}: {
+  params: Promise<{
+    clientId: string;
+    sessionId: string;
+  }>;
+}) {
   const { clientId } = await params;
 
   // Fetch client sessions

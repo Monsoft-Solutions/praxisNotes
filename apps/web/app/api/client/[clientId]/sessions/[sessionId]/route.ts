@@ -11,7 +11,7 @@ import { eq } from "drizzle-orm";
  */
 export async function GET(
   request: NextRequest,
-  { params }: { params: { clientId: string; sessionId: string } },
+  { params }: { params: Promise<{ clientId: string; sessionId: string }> },
 ) {
   return withDb(async () => {
     try {
@@ -73,7 +73,7 @@ export async function GET(
  */
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { clientId: string; sessionId: string } },
+  { params }: { params: Promise<{ clientId: string; sessionId: string }> },
 ) {
   return withDb(async () => {
     try {
@@ -169,7 +169,7 @@ export async function PUT(
  */
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { clientId: string; sessionId: string } },
+  { params }: { params: Promise<{ clientId: string; sessionId: string }> },
 ) {
   return withDb(async () => {
     try {

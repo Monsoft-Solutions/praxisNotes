@@ -16,7 +16,7 @@ import { createSessionNotesPrompt } from "@/lib/ai";
  */
 export async function POST(
   request: NextRequest,
-  { params }: { params: { clientId: string; sessionId: string } },
+  { params }: { params: Promise<{ clientId: string; sessionId: string }> },
 ) {
   return withDb(async () => {
     try {
@@ -94,7 +94,7 @@ export async function POST(
  */
 export async function GET(
   _request: NextRequest,
-  { params }: { params: { clientId: string; sessionId: string } },
+  { params }: { params: Promise<{ clientId: string; sessionId: string }> },
 ) {
   return withDb(async () => {
     try {
@@ -145,7 +145,7 @@ export async function GET(
  */
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { clientId: string; sessionId: string } },
+  { params }: { params: Promise<{ clientId: string; sessionId: string }> },
 ) {
   return withDb(async () => {
     try {

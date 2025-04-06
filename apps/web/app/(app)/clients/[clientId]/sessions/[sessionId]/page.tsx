@@ -28,14 +28,14 @@ export const metadata: Metadata = {
   description: "View session details",
 };
 
-interface PageProps {
-  params: {
+export default async function SessionDetailsPage({
+  params,
+}: {
+  params: Promise<{
     clientId: string;
     sessionId: string;
-  };
-}
-
-export default async function SessionDetailsPage({ params }: PageProps) {
+  }>;
+}) {
   const { clientId, sessionId } = await params;
 
   // Fetch session details
