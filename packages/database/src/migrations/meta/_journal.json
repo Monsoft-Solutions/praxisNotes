@@ -50,6 +50,13 @@
       "when": 1743797076663,
       "tag": "0006_powerful_lethal_legion",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1743907958350,
+      "tag": "0007_cynical_smasher",
+      "breakpoints": true
     }
   ]
 }
