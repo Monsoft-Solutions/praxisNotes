@@ -172,6 +172,122 @@ export async function seedBehaviors(
       createdBy: defaultUserId,
       updatedBy: defaultUserId,
     },
+
+    // Additional challenging behaviors
+    {
+      name: "Bolting",
+      description:
+        "Suddenly running away or quickly moving away from supervision",
+      category: "challenging",
+      organizationId: null,
+      createdBy: defaultUserId,
+      updatedBy: defaultUserId,
+    },
+    {
+      name: "Disruptive behavior",
+      description:
+        "Actions that interrupt or disrupt ongoing activities or the learning environment",
+      category: "challenging",
+      organizationId: null,
+      createdBy: defaultUserId,
+      updatedBy: defaultUserId,
+    },
+    {
+      name: "Climbing",
+      description:
+        "Climbing on furniture, equipment, or structures that are not meant for climbing",
+      category: "challenging",
+      organizationId: null,
+      createdBy: defaultUserId,
+      updatedBy: defaultUserId,
+    },
+    {
+      name: "Off-task",
+      description:
+        "Disengagement from assigned or expected tasks and activities",
+      category: "challenging",
+      organizationId: null,
+      createdBy: defaultUserId,
+      updatedBy: defaultUserId,
+    },
+    {
+      name: "Throwing objects",
+      description: "Throwing items inappropriately or in a dangerous manner",
+      category: "challenging",
+      organizationId: null,
+      createdBy: defaultUserId,
+      updatedBy: defaultUserId,
+    },
+    {
+      name: "Defiant behavior",
+      description: "Deliberately disobeying rules or direct instructions",
+      category: "challenging",
+      organizationId: null,
+      createdBy: defaultUserId,
+      updatedBy: defaultUserId,
+    },
+    {
+      name: "Temper tantrum",
+      description:
+        "Intense emotional outburst characterized by extreme anger or frustration",
+      category: "challenging",
+      organizationId: null,
+      createdBy: defaultUserId,
+      updatedBy: defaultUserId,
+    },
+    {
+      name: "Inappropriate sexual behavior toward self",
+      description:
+        "Engaging in sexual self-stimulation or behavior that is inappropriate for the setting or context",
+      category: "challenging",
+      organizationId: null,
+      createdBy: defaultUserId,
+      updatedBy: defaultUserId,
+    },
+    {
+      name: "Verbal aggression",
+      description:
+        "Using threatening, hostile, or inappropriate language toward others",
+      category: "challenging",
+      organizationId: null,
+      createdBy: defaultUserId,
+      updatedBy: defaultUserId,
+    },
+    {
+      name: "Food refusal",
+      description: "Refusing to eat or engage with food during mealtimes",
+      category: "challenging",
+      organizationId: null,
+      createdBy: defaultUserId,
+      updatedBy: defaultUserId,
+    },
+    {
+      name: "Stereotypic behavior",
+      description:
+        "Repetitive movements or actions without clear functional purpose",
+      category: "challenging",
+      organizationId: null,
+      createdBy: defaultUserId,
+      updatedBy: defaultUserId,
+    },
+    {
+      name: "Screaming/yelling",
+      description:
+        "Loud vocalizations that are disruptive or inappropriate for the setting",
+      category: "challenging",
+      organizationId: null,
+      createdBy: defaultUserId,
+      updatedBy: defaultUserId,
+    },
+    {
+      name: "Inappropriate touching",
+      description:
+        "Touching others in ways that violate personal boundaries or social norms",
+      category: "challenging",
+      organizationId: null,
+      createdBy: defaultUserId,
+      updatedBy: defaultUserId,
+    },
   ];
 
   // Organization-specific behaviors
@@ -206,6 +322,24 @@ export async function seedBehaviors(
       name: "Using calm down strategies",
       description: "Utilizes taught self-regulation strategies when upset",
       category: "emotional",
+      organizationId,
+      createdBy: defaultUserId,
+      updatedBy: defaultUserId,
+    },
+    {
+      name: "Peer interaction avoidance",
+      description:
+        "Consistently avoids or refuses to interact with peers when opportunities arise",
+      category: "social",
+      organizationId,
+      createdBy: defaultUserId,
+      updatedBy: defaultUserId,
+    },
+    {
+      name: "Transitional aggression",
+      description:
+        "Displays aggressive behaviors specifically during activity transitions",
+      category: "challenging",
       organizationId,
       createdBy: defaultUserId,
       updatedBy: defaultUserId,
