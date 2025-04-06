@@ -45,6 +45,7 @@ The report should:
 5. Include specific data about behaviors, prompts, and reinforcements within the narrative
 6. Maintain chronological flow between activities
 7. End with a brief summary of environmental factors and plans for the next session
+8. Don't be verbose, just write the report in a concise manner
 
 Please provide ONLY the narrative report without any section headings, metadata, or additional commentary.
 `;

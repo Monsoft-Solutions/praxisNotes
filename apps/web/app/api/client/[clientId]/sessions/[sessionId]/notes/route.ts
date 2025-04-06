@@ -51,16 +51,16 @@ export async function POST(
       }
 
       // Check if notes already exist
-      const existingNotes = await db
-        .select()
-        .from(sessionNotes)
-        .where(eq(sessionNotes.sessionId, sessionId))
-        .limit(1);
+      //   const existingNotes = await db
+      //     .select()
+      //     .from(sessionNotes)
+      //     .where(eq(sessionNotes.sessionId, sessionId))
+      //     .limit(1);
 
-      if (existingNotes.length > 0) {
-        // Return existing notes if they exist
-        return createApiResponse(existingNotes[0]);
-      }
+      //   if (existingNotes.length > 0) {
+      //     // Return existing notes if they exist
+      //     return createApiResponse(existingNotes[0]);
+      //   }
 
       // Generate notes using AI
       const formData = sessionData.formData as SessionFormData;
@@ -210,7 +210,7 @@ async function generateSessionNotes(sessionData: SessionFormData) {
 
   try {
     const { text, reasoning } = await generateText({
-      model: anthropic("claude-3-5-sonnet-20240620"),
+      model: anthropic("claude-3-7-sonnet-latest"),
       prompt,
     });
 

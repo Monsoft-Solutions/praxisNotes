@@ -2,7 +2,7 @@ import { db } from "../client";
 import { antecedents, users, organizations } from "../schema";
 
 /**
- * Seed antecedents table with common ABA antecedents
+ * Seed antecedents table with common RBT session activities
  * Some antecedents are global (null organizationId) and some are org-specific
  */
 export async function seedAntecedents(
@@ -20,105 +20,107 @@ export async function seedAntecedents(
 
   // Global antecedents (available to all organizations)
   const globalAntecedents = [
-    // Environmental antecedents
+    // Structured Learning activities
     {
-      name: "Loud noises",
-      description: "Sudden or persistent loud noises in the environment",
-      category: "environmental",
+      name: "DTT session",
+      description: "Discrete Trial Training session with client",
+      category: "structured_learning",
       organizationId: null,
       createdBy: defaultUserId,
       updatedBy: defaultUserId,
     },
     {
-      name: "Crowded spaces",
-      description: "Areas with many people or limited personal space",
-      category: "environmental",
+      name: "PECS training",
+      description: "Picture Exchange Communication System training",
+      category: "structured_learning",
       organizationId: null,
       createdBy: defaultUserId,
       updatedBy: defaultUserId,
     },
     {
-      name: "Changes in routine",
-      description: "Unexpected changes or transitions in the daily schedule",
-      category: "environmental",
-      organizationId: null,
-      createdBy: defaultUserId,
-      updatedBy: defaultUserId,
-    },
-
-    // Physiological antecedents
-    {
-      name: "Hunger",
-      description: "Feeling hungry or not having eaten recently",
-      category: "physiological",
-      organizationId: null,
-      createdBy: defaultUserId,
-      updatedBy: defaultUserId,
-    },
-    {
-      name: "Fatigue",
-      description: "Feeling tired or not having adequate sleep",
-      category: "physiological",
-      organizationId: null,
-      createdBy: defaultUserId,
-      updatedBy: defaultUserId,
-    },
-    {
-      name: "Physical discomfort",
-      description: "Experiencing pain, illness, or sensory discomfort",
-      category: "physiological",
+      name: "Social skills group",
+      description: "Facilitated social skills group activity",
+      category: "structured_learning",
       organizationId: null,
       createdBy: defaultUserId,
       updatedBy: defaultUserId,
     },
 
-    // Social antecedents
+    // Natural Environment Teaching
     {
-      name: "Denied access to preferred item/activity",
-      description: "Being unable to access a desired item or activity",
-      category: "social",
+      name: "Playground activity",
+      description: "Supervised play and skills practice at playground",
+      category: "natural_environment",
       organizationId: null,
       createdBy: defaultUserId,
       updatedBy: defaultUserId,
     },
     {
-      name: "Peer conflict",
-      description: "Disagreements or conflicts with peers",
-      category: "social",
+      name: "Snack/mealtime",
+      description: "Supervised mealtime with targeted skills practice",
+      category: "natural_environment",
       organizationId: null,
       createdBy: defaultUserId,
       updatedBy: defaultUserId,
     },
     {
-      name: "Instructional demands",
-      description: "Being presented with tasks or instructions",
-      category: "social",
+      name: "Community outing",
+      description:
+        "Supervised community-based activity for skill generalization",
+      category: "natural_environment",
       organizationId: null,
       createdBy: defaultUserId,
       updatedBy: defaultUserId,
     },
 
-    // Emotional antecedents
+    // Behavioral Interventions
     {
-      name: "Anxiety",
-      description: "Feeling anxious or worried about a situation",
-      category: "emotional",
+      name: "Token economy implementation",
+      description: "Using token economy for behavior reinforcement",
+      category: "behavioral",
       organizationId: null,
       createdBy: defaultUserId,
       updatedBy: defaultUserId,
     },
     {
-      name: "Frustration",
-      description: "Feeling frustrated with a task or situation",
-      category: "emotional",
+      name: "Functional communication training",
+      description:
+        "Teaching appropriate communication to replace problem behaviors",
+      category: "behavioral",
       organizationId: null,
       createdBy: defaultUserId,
       updatedBy: defaultUserId,
     },
     {
-      name: "Sensory overload",
-      description: "Experiencing overwhelming sensory input",
-      category: "emotional",
+      name: "Self-regulation activity",
+      description: "Teaching and practicing self-regulation strategies",
+      category: "behavioral",
+      organizationId: null,
+      createdBy: defaultUserId,
+      updatedBy: defaultUserId,
+    },
+
+    // Skill Development
+    {
+      name: "Daily living skills",
+      description: "Teaching and practicing daily living and self-help skills",
+      category: "skill_development",
+      organizationId: null,
+      createdBy: defaultUserId,
+      updatedBy: defaultUserId,
+    },
+    {
+      name: "Academic support",
+      description: "Providing support with academic tasks and skills",
+      category: "skill_development",
+      organizationId: null,
+      createdBy: defaultUserId,
+      updatedBy: defaultUserId,
+    },
+    {
+      name: "Play skills development",
+      description: "Teaching appropriate play skills and interactions",
+      category: "skill_development",
       organizationId: null,
       createdBy: defaultUserId,
       updatedBy: defaultUserId,
@@ -128,33 +130,33 @@ export async function seedAntecedents(
   // Organization-specific antecedents
   const organizationAntecedents = [
     {
-      name: "Specific classroom transitions",
-      description: "Transitions between specific classroom activities",
-      category: "environmental",
+      name: "Clinic-based assessment",
+      description: "Assessment activities conducted at the clinic",
+      category: "assessment",
       organizationId,
       createdBy: defaultUserId,
       updatedBy: defaultUserId,
     },
     {
-      name: "Particular staff interactions",
-      description: "Interactions with specific staff members",
-      category: "social",
+      name: "Parent training session",
+      description: "Training parents on implementing behavioral strategies",
+      category: "caregiver_training",
       organizationId,
       createdBy: defaultUserId,
       updatedBy: defaultUserId,
     },
     {
-      name: "Organization-specific demands",
-      description: "Tasks or expectations specific to the organization",
-      category: "social",
+      name: "Transition planning",
+      description: "Activities to support transitions between environments",
+      category: "transition_support",
       organizationId,
       createdBy: defaultUserId,
       updatedBy: defaultUserId,
     },
     {
-      name: "Specific sensory triggers",
-      description: "Particular sensory inputs relevant to the environment",
-      category: "environmental",
+      name: "Specialized protocol implementation",
+      description: "Implementation of organization-specific protocols",
+      category: "specialized_protocols",
       organizationId,
       createdBy: defaultUserId,
       updatedBy: defaultUserId,

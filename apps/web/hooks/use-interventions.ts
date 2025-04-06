@@ -53,3 +53,21 @@ export function useInterventions(params?: InterventionsParams) {
     refresh: mutate,
   };
 }
+
+/**
+ * Hook to fetch a single intervention by ID
+ */
+export function useIntervention(id: string) {
+  const { data, error, isLoading, mutate } = useSWR<ApiResponse<Intervention>>(
+    id ? `/api/interventions/${id}` : null,
+    fetcher,
+  );
+
+  return {
+    intervention: data?.data,
+    isLoading,
+    isError: !!error,
+    error,
+    refresh: mutate,
+  };
+}
