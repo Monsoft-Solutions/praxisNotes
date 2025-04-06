@@ -68,10 +68,10 @@ export async function POST(
       if (body.abcEntries && body.abcEntries.length > 0) {
         // Create ABC entries in the database
         await Promise.all(
-          body.abcEntries.map(async (entry: ABCEntry, index: number) => {
+          body.abcEntries.map(async (entry, index: number) => {
             await db.insert(sessionABCs).values({
               sessionId: newSession.id,
-              antecedent: entry.activityAntecedent,
+              antecedent: entry.activityAntecedent || "", // Use empty string as fallback
               behavior: entry.behaviors.join(", "),
               consequence: [
                 ...entry.interventions,

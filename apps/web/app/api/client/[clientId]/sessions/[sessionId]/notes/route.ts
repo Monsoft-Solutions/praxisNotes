@@ -1,13 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db, withDb } from "@/lib/db";
 import { sessions, sessionNotes } from "@praxisnotes/database";
-import { NotesGenerationRequest, SessionFormData } from "@praxisnotes/types";
+import { SessionFormData, ErrorCode } from "@praxisnotes/types";
 import { createApiResponse, createErrorResponse } from "@/lib/api";
 import { requireAuthWithOrg } from "@/lib/auth/auth";
-import { ErrorCode } from "@praxisnotes/types";
 import { eq } from "drizzle-orm";
 import { anthropic } from "@ai-sdk/anthropic";
-import { openai } from "@ai-sdk/openai";
 import { generateText } from "ai";
 import { createSessionNotesPrompt } from "@/lib/ai";
 

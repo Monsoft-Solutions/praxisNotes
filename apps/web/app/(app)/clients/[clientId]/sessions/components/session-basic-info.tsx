@@ -38,7 +38,7 @@ export function SessionBasicInfo() {
 
   const handleKeyDown = (
     e: React.KeyboardEvent<HTMLInputElement>,
-    field: any,
+    field: { value: string[]; onChange: (value: string[]) => void },
     type: "participants" | "environmental",
   ) => {
     const input =
@@ -195,7 +195,7 @@ export function SessionBasicInfo() {
 
                 {field.value.length > 0 && (
                   <div className="flex flex-wrap gap-2 mt-2">
-                    {field.value.map((participant, index) => (
+                    {field.value.map((participant: string, index: number) => (
                       <Tag
                         key={`${participant}-${index}`}
                         text={participant}
@@ -253,7 +253,7 @@ export function SessionBasicInfo() {
 
                 {field.value.length > 0 && (
                   <div className="flex flex-wrap gap-2 mt-2">
-                    {field.value.map((change, index) => (
+                    {field.value.map((change: string, index: number) => (
                       <Tag
                         key={`${change}-${index}`}
                         text={change}
