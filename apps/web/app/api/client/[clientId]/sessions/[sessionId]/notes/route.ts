@@ -30,7 +30,7 @@ export async function POST(
         );
       }
 
-      const { clientId, sessionId } = params;
+      const { clientId, sessionId } = await params;
 
       if (!clientId || !sessionId) {
         return createErrorResponse(
@@ -108,7 +108,7 @@ export async function GET(
         );
       }
 
-      const { sessionId } = params;
+      const { sessionId } = await params;
 
       if (!sessionId) {
         return createErrorResponse(
@@ -159,7 +159,7 @@ export async function PUT(
         );
       }
 
-      const { sessionId } = params;
+      const { sessionId } = await params;
 
       if (!sessionId) {
         return createErrorResponse(
