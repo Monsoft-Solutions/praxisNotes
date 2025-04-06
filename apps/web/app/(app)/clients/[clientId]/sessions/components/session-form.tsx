@@ -17,44 +17,67 @@ import { ValuationSelector } from "./valuation-selector";
 interface SessionFormProps {
   clientId: string;
   clientName: string;
+  sessionId?: string;
+  initialData?: any;
+  sessionStatus?: string;
 }
 
-export function SessionForm({ clientId, clientName }: SessionFormProps) {
+export function SessionForm({
+  clientId,
+  clientName,
+  sessionId,
+  initialData,
+  sessionStatus,
+}: SessionFormProps) {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
 
-  // Initialize form with default values
+  // Initialize form with default values or initial data if provided
   const form = useForm<SessionFormValues>({
     resolver: zodResolver(sessionFormSchema),
-    defaultValues: {
-      sessionDate: new Date(),
-      startTime: "",
-      endTime: "",
-      location: "",
-      presentParticipants: [],
-      environmentalChanges: [],
-      abcEntries: [
-        {
-          id: uuidv4(),
-          activityAntecedent: "",
-          behaviors: [],
-          interventions: [],
-          replacementPrograms: [],
+    defaultValues: initialData
+      ? {
+          ...initialData,
+          sessionDate: new Date(initialData.sessionDate),
+        }
+      : {
+          sessionDate: new Date(),
+          startTime: "",
+          endTime: "",
+          location: "",
+          presentParticipants: [],
+          environmentalChanges: [],
+          abcEntries: [
+            {
+              id: uuidv4(),
+              activityAntecedent: "",
+              behaviors: [],
+              interventions: [],
+              replacementPrograms: [],
+            },
+          ],
+          reinforcers: [],
+          valuation: "good",
         },
-      ],
-      reinforcers: [],
-      valuation: "good",
-    },
   });
+
+  const isEditing = !!sessionId;
+  const buttonStatus = sessionStatus === "submitted" ? "Completed" : "Draft";
 
   // Handle saving as draft
   const handleSaveDraft = async (data: SessionFormValues) => {
     setIsSubmitting(true);
 
     try {
-      const response = await fetch(`/api/client/${clientId}/sessions`, {
-        method: "POST",
+      const url = isEditing
+        ? `/api/client/${clientId}/sessions/${sessionId}`
+        : `/api/client/${clientId}/sessions`;
+
+      const method = isEditing ? "PUT" : "POST";
+
+      const response = await fetch(url, {
+        method,
         headers: {
           "Content-Type": "application/json",
         },
@@ -70,10 +93,11 @@ export function SessionForm({ clientId, clientName }: SessionFormProps) {
       }
 
       const sessionData = await response.json();
+      const sessionIdToUse = isEditing ? sessionId : sessionData.data.id;
 
       toast.success("Session saved as draft");
       router.refresh();
-      router.push(`/clients/${clientId}/sessions/${sessionData.data.id}`);
+      router.push(`/clients/${clientId}/sessions/${sessionIdToUse}`);
     } catch (error) {
       console.error("Error saving draft:", error);
       toast.error(
@@ -89,9 +113,15 @@ export function SessionForm({ clientId, clientName }: SessionFormProps) {
     setIsGenerating(true);
 
     try {
-      // First save the session to get a session ID
-      const saveResponse = await fetch(`/api/client/${clientId}/sessions`, {
-        method: "POST",
+      // First save the session to get a session ID (or update existing)
+      const saveUrl = isEditing
+        ? `/api/client/${clientId}/sessions/${sessionId}`
+        : `/api/client/${clientId}/sessions`;
+
+      const saveMethod = isEditing ? "PUT" : "POST";
+
+      const saveResponse = await fetch(saveUrl, {
+        method: saveMethod,
         headers: {
           "Content-Type": "application/json",
         },
@@ -107,18 +137,18 @@ export function SessionForm({ clientId, clientName }: SessionFormProps) {
       }
 
       const sessionData = await saveResponse.json();
-      const sessionId = sessionData.data.id;
+      const sessionIdToUse = isEditing ? sessionId : sessionData.data.id;
 
       // Then generate notes
       const generateResponse = await fetch(
-        `/api/client/${clientId}/sessions/${sessionId}/notes`,
+        `/api/client/${clientId}/sessions/${sessionIdToUse}/notes`,
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            sessionId,
+            sessionId: sessionIdToUse,
             clientId,
           }),
         },
@@ -131,7 +161,7 @@ export function SessionForm({ clientId, clientName }: SessionFormProps) {
 
       toast.success("Notes generated successfully");
       router.refresh();
-      router.push(`/clients/${clientId}/sessions/${sessionId}/notes`);
+      router.push(`/clients/${clientId}/sessions/${sessionIdToUse}/notes`);
     } catch (error) {
       console.error("Error generating notes:", error);
       toast.error(
@@ -150,7 +180,7 @@ export function SessionForm({ clientId, clientName }: SessionFormProps) {
   return (
     <FormProvider {...form}>
       <form className="space-y-8">
-        <SessionHeader clientName={clientName} />
+        <SessionHeader clientName={clientName} isEditing={isEditing} />
 
         <SessionBasicInfo />
 
@@ -174,14 +204,22 @@ export function SessionForm({ clientId, clientName }: SessionFormProps) {
             disabled={isSubmitting || isGenerating}
             className={isSubmitting ? "opacity-70 cursor-not-allowed" : ""}
           >
-            {isSubmitting ? "Saving..." : "Save as Draft"}
+            {isSubmitting
+              ? "Saving..."
+              : isEditing
+                ? "Update Draft"
+                : "Save as Draft"}
           </Button>
           <Button
             onClick={form.handleSubmit(handleGenerateNotes)}
             disabled={isSubmitting || isGenerating}
             className={isGenerating ? "opacity-70 cursor-not-allowed" : ""}
           >
-            {isGenerating ? "Generating..." : "Generate Notes"}
+            {isGenerating
+              ? "Generating..."
+              : isEditing
+                ? "Update & Generate Notes"
+                : "Generate Notes"}
           </Button>
         </div>
       </form>

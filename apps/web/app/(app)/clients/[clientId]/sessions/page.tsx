@@ -29,7 +29,7 @@ interface Session {
 }
 
 export default async function SessionsPage({ params }: PageProps) {
-  const { clientId } = params;
+  const { clientId } = await params;
 
   // Fetch client sessions
   const clientSessions = await db

@@ -26,7 +26,7 @@ export async function GET(
         );
       }
 
-      const { clientId, sessionId } = params;
+      const { clientId, sessionId } = await params;
 
       if (!clientId || !sessionId) {
         return createErrorResponse(
@@ -88,7 +88,7 @@ export async function PUT(
         );
       }
 
-      const { clientId, sessionId } = params;
+      const { clientId, sessionId } = await params;
 
       if (!clientId || !sessionId) {
         return createErrorResponse(
@@ -184,7 +184,7 @@ export async function DELETE(
         );
       }
 
-      const { clientId, sessionId } = params;
+      const { clientId, sessionId } = await params;
 
       if (!clientId || !sessionId) {
         return createErrorResponse(

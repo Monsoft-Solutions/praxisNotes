@@ -115,7 +115,7 @@ export async function GET(
         );
       }
 
-      const { clientId } = params;
+      const { clientId } = await params;
 
       if (!clientId) {
         return createErrorResponse(

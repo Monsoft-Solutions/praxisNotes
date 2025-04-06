@@ -17,9 +17,14 @@ import ReactMarkdown from "react-markdown";
 interface NotesEditorProps {
   clientId: string;
   sessionId: string;
+  initialData?: any;
 }
 
-export function NotesEditor({ clientId, sessionId }: NotesEditorProps) {
+export function NotesEditor({
+  clientId,
+  sessionId,
+  initialData,
+}: NotesEditorProps) {
   const router = useRouter();
   const [editorValue, setEditorValue] = useState("");
   const [activeTab, setActiveTab] = useState<"edit" | "preview">("edit");
@@ -31,14 +36,16 @@ export function NotesEditor({ clientId, sessionId }: NotesEditorProps) {
     updateNotes,
     isGenerating,
     isUpdating,
-  } = useSessionNotes(clientId, sessionId);
+  } = useSessionNotes(clientId, sessionId, initialData);
 
   // Set editor value when notes are loaded
   useEffect(() => {
     if (notes && notes.content) {
       setEditorValue(notes.content);
+    } else if (initialData && initialData.content) {
+      setEditorValue(initialData.content);
     }
-  }, [notes]);
+  }, [notes, initialData]);
 
   // Handle generate notes
   const handleGenerate = async () => {
@@ -71,7 +78,7 @@ export function NotesEditor({ clientId, sessionId }: NotesEditorProps) {
     URL.revokeObjectURL(url);
   };
 
-  if (isLoading) {
+  if (isLoading && !initialData) {
     return (
       <Card className="w-full h-full">
         <CardContent className="flex items-center justify-center min-h-[500px]">
@@ -81,13 +88,15 @@ export function NotesEditor({ clientId, sessionId }: NotesEditorProps) {
     );
   }
 
+  const hasNotes = notes || initialData || editorValue;
+
   return (
     <Card className="w-full h-full">
       <CardHeader>
         <CardTitle className="flex justify-between items-center">
           <span>Session Notes</span>
           <div className="flex gap-2">
-            {!notes && (
+            {!hasNotes && (
               <Button
                 onClick={handleGenerate}
                 disabled={isGenerating}
@@ -99,7 +108,7 @@ export function NotesEditor({ clientId, sessionId }: NotesEditorProps) {
                 {isGenerating ? "Generating..." : "Generate Notes"}
               </Button>
             )}
-            {notes && (
+            {hasNotes && (
               <Button
                 onClick={handleGenerate}
                 disabled={isGenerating}
@@ -132,7 +141,7 @@ export function NotesEditor({ clientId, sessionId }: NotesEditorProps) {
         </CardTitle>
       </CardHeader>
       <CardContent>
-        {notes || editorValue ? (
+        {hasNotes ? (
           <div className="w-full">
             <div className="flex mb-4 border-b">
               <button

@@ -1,6 +1,6 @@
 import { Metadata } from "next";
 import { db } from "@/lib/db";
-import { sessions } from "@praxisnotes/database";
+import { sessions, sessionNotes } from "@praxisnotes/database";
 import { eq } from "drizzle-orm";
 import { redirect } from "next/navigation";
 import { NotesEditor } from "./components/notes-editor";
@@ -37,6 +37,13 @@ export default async function NotesPage({ params }: PageProps) {
   if (!sessionData) {
     redirect(`/clients/${clientId}/sessions`);
   }
+
+  // Fetch session notes data
+  const [notesData] = await db
+    .select()
+    .from(sessionNotes)
+    .where(eq(sessionNotes.sessionId, sessionId))
+    .limit(1);
 
   // Get client name from form data
   const clientName = (sessionData.formData as any)?.clientName || "Client";
@@ -81,7 +88,11 @@ export default async function NotesPage({ params }: PageProps) {
           View, edit, and generate session notes for your therapy session.
         </p>
 
-        <NotesEditor clientId={clientId} sessionId={sessionId} />
+        <NotesEditor
+          clientId={clientId}
+          sessionId={sessionId}
+          initialData={notesData}
+        />
       </div>
     </div>
   );

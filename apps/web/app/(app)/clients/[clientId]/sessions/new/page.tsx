@@ -17,7 +17,7 @@ interface PageProps {
 }
 
 export default async function NewSessionPage({ params }: PageProps) {
-  const { clientId } = params;
+  const { clientId } = await params;
 
   // Fetch client data to get the name
   const [clientData] = await db

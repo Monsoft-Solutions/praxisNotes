@@ -12,12 +12,17 @@ interface SessionNotesResponse {
   updatedAt: string;
 }
 
-export function useSessionNotes(clientId?: string, sessionId?: string) {
+export function useSessionNotes(
+  clientId?: string,
+  sessionId?: string,
+  initialData?: SessionNotesResponse,
+) {
   const shouldFetch = !!clientId && !!sessionId;
 
   const { data, error, isLoading, mutate } = useSWR<SessionNotesResponse>(
     shouldFetch ? `/api/client/${clientId}/sessions/${sessionId}/notes` : null,
     fetcher,
+    { fallbackData: initialData },
   );
 
   // Generate notes mutation
