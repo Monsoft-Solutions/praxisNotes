@@ -7,6 +7,7 @@ import { requireAuthWithOrg } from "@/lib/auth/auth";
 import { ErrorCode } from "@praxisnotes/types";
 import { eq } from "drizzle-orm";
 import { anthropic } from "@ai-sdk/anthropic";
+import { openai } from "@ai-sdk/openai";
 import { generateText } from "ai";
 import { createSessionNotesPrompt } from "@/lib/ai";
 
@@ -211,6 +212,7 @@ async function generateSessionNotes(sessionData: SessionFormData) {
   try {
     const { text, reasoning } = await generateText({
       model: anthropic("claude-3-7-sonnet-latest"),
+      // model: openai("gpt-4.5-preview"),
       prompt,
     });
 

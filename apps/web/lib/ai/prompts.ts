@@ -46,6 +46,7 @@ The report should:
 6. Maintain chronological flow between activities
 7. End with a brief summary of environmental factors and plans for the next session
 8. Don't be verbose, just write the report in a concise manner
+9. Use 3rd person to write the report. Don't use "I" or "we" to refer to the RBT.
 
 Please provide ONLY the narrative report without any section headings, metadata, or additional commentary.
 `;
