@@ -13,6 +13,9 @@ export * from "./client.table";
 // Behaviors
 export * from "./behavior.table";
 
+// Antecedents
+export * from "./antecedent.table";
+
 // Interventions
 export * from "./intervention.table";
 

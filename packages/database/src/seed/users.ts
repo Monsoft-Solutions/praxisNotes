@@ -14,6 +14,13 @@ export async function seed() {
     throw new Error("Default organization not found");
   }
 
+  const usersResults = await db.select().from(users).limit(1);
+
+  if (usersResults.length > 0) {
+    console.log("✅ Users already seeded");
+    return;
+  }
+
   const defaultOrganization = organizationsResults[0]!;
 
   try {

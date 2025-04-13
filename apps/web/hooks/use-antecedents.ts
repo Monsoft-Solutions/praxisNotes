@@ -1,24 +1,25 @@
 import useSWR from "swr";
-import { Intervention } from "@praxisnotes/database";
-import { ApiResponse } from "@praxisnotes/types";
 import { fetcher } from "@/lib/fetcher";
+import { ApiResponse } from "@praxisnotes/types";
+import { Antecedent } from "@praxisnotes/database";
 
-type InterventionsParams = {
+// Define params interface
+interface AntecedentsParams {
   page?: number;
   limit?: number;
   search?: string;
   category?: string;
-  sort?: string;
+  sort?: "name" | "category" | "createdAt";
   order?: "asc" | "desc";
-};
+}
 
 /**
- * Hook to fetch interventions for the current user
- * Gets both global interventions and organization-specific interventions
+ * Hook to fetch antecedents for the current user
+ * Gets both global antecedents and organization-specific antecedents
  *
  * @param params Optional parameters for pagination, filtering, and sorting
  */
-export function useInterventions(params?: InterventionsParams) {
+export function useAntecedents(params?: AntecedentsParams) {
   const queryParams = new URLSearchParams();
 
   if (params) {
@@ -31,14 +32,15 @@ export function useInterventions(params?: InterventionsParams) {
   }
 
   const queryString = queryParams.toString();
-  const url = `/api/interventions${queryString ? `?${queryString}` : ""}`;
+  const url = `/api/antecedents${queryString ? `?${queryString}` : ""}`;
 
-  const { data, error, isLoading, mutate } = useSWR<
-    ApiResponse<Intervention[]>
-  >(url, fetcher);
+  const { data, error, isLoading, mutate } = useSWR<ApiResponse<Antecedent[]>>(
+    url,
+    fetcher,
+  );
 
   return {
-    interventions: data?.data || [],
+    antecedents: data?.data || [],
     pagination: data?.pagination
       ? {
           page: data.pagination.page || 1,
@@ -47,24 +49,6 @@ export function useInterventions(params?: InterventionsParams) {
           totalPages: data.pagination.totalPages || 0,
         }
       : null,
-    isLoading,
-    isError: !!error,
-    error,
-    refresh: mutate,
-  };
-}
-
-/**
- * Hook to fetch a single intervention by ID
- */
-export function useIntervention(id: string) {
-  const { data, error, isLoading, mutate } = useSWR<ApiResponse<Intervention>>(
-    id ? `/api/interventions/${id}` : null,
-    fetcher,
-  );
-
-  return {
-    intervention: data?.data,
     isLoading,
     isError: !!error,
     error,

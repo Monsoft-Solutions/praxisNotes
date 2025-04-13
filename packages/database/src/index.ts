@@ -9,3 +9,5 @@ export * from "./enums";
 
 // Export seed functions
 export * from "./seed";
+
+export * from "./schema/session.table";
